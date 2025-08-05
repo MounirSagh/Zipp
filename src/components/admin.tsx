@@ -6,7 +6,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { useClerk, useUser } from "@clerk/clerk-react"
+import { useUser } from "@clerk/clerk-react"
 
 function Admin() {
   const [orders, setOrders] = useState<any[]>([])
@@ -69,11 +69,11 @@ function Admin() {
     fetchOrders()
   }
 
-  const handleReady = async (orderId: number, phone: string) => {
-    await updateOrderStatus(orderId, "ready")
-    await sendSMS(phone, `Your order #${orderId} is ready for pickup! 🍽️`)
-    fetchOrders()
-  }
+  // const handleReady = async (orderId: number, phone: string) => {
+  //   await updateOrderStatus(orderId, "ready")
+  //   await sendSMS(phone, `Your order #${orderId} is ready for pickup! 🍽️`)
+  //   fetchOrders()
+  // }
 
   const handleReject = async (orderId: number, phone: string) => {
     await updateOrderStatus(orderId, "rejected")

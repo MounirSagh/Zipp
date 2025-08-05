@@ -1,5 +1,4 @@
 import { SignIn } from '@clerk/clerk-react'
-import { SignInButton } from '@clerk/clerk-react'
 
 function Home() {
   return (

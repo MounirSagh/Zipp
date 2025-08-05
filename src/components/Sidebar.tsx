@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { Bot, Box, Headset, History, Home, Users } from "lucide-react";
+import { Box,  Home, Users } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 
 // Navigation items

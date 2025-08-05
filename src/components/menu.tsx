@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Edit2, Trash2, Save, X, ShoppingCart, Eye, EyeOff, Search, RefreshCw, Database } from "lucide-react"
+import { Plus, Edit2, Trash2, Save, X, ShoppingCart, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog" // Assuming Dialog components are available
@@ -14,12 +14,12 @@ function Menu() {
   const [success, setSuccess] = useState("")
 
   // Search state
-  const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<any[]>([])
-  const [isSearching, setIsSearching] = useState(false)
+  const [searchQuery, ] = useState("")
+  const [searchResults, ] = useState<any[]>([])
+  const [, ] = useState(false)
 
   // Sync state
-  const [isSyncing, setIsSyncing] = useState(false)
+  // const [isSyncing, setIsSyncing] = useState(false)
 
   // Modal states
   const [showCategoryModal, setShowCategoryModal] = useState(false)
@@ -83,56 +83,56 @@ function Menu() {
   }
 
   // Search menu using vector database
-  const searchMenu = async () => {
-    if (!searchQuery.trim()) return
-    try {
-      setIsSearching(true)
-      const response = await fetch(`${API_BASE}/search`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query: searchQuery,
-          restaurantId: restaurantId,
-          topK: 10,
-        }),
-      })
-      const data = await response.json()
-      if (data.success) {
-        setSearchResults(data.data)
-        setShowSearchModal(true)
-      } else {
-        setError(data.error || "Search failed")
-      }
-    } catch (err) {
-      setError("Network error while searching")
-      console.error(err)
-    } finally {
-      setIsSearching(false)
-    }
-  }
+  // const searchMenu = async () => {
+  //   if (!searchQuery.trim()) return
+  //   try {
+  //     setIsSearching(true)
+  //     const response = await fetch(`${API_BASE}/search`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         query: searchQuery,
+  //         restaurantId: restaurantId,
+  //         topK: 10,
+  //       }),
+  //     })
+  //     const data = await response.json()
+  //     if (data.success) {
+  //       setSearchResults(data.data)
+  //       setShowSearchModal(true)
+  //     } else {
+  //       setError(data.error || "Search failed")
+  //     }
+  //   } catch (err) {
+  //     setError("Network error while searching")
+  //     console.error(err)
+  //   } finally {
+  //     setIsSearching(false)
+  //   }
+  // }
 
   // Sync existing data to vector database
-  const syncToVectorDB = async () => {
-    try {
-      setIsSyncing(true)
-      const response = await fetch(`${API_BASE}/sync`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ restaurantId }),
-      })
-      const data = await response.json()
-      if (data.success) {
-        setSuccess(`Successfully synced ${data.categoriesCount} categories to vector database`)
-      } else {
-        setError(data.error || "Sync failed")
-      }
-    } catch (err) {
-      setError("Network error while syncing")
-      console.error(err)
-    } finally {
-      setIsSyncing(false)
-    }
-  }
+  // const syncToVectorDB = async () => {
+  //   try {
+  //     setIsSyncing(true)
+  //     const response = await fetch(`${API_BASE}/sync`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ restaurantId }),
+  //     })
+  //     const data = await response.json()
+  //     if (data.success) {
+  //       setSuccess(`Successfully synced ${data.categoriesCount} categories to vector database`)
+  //     } else {
+  //       setError(data.error || "Sync failed")
+  //     }
+  //   } catch (err) {
+  //     setError("Network error while syncing")
+  //     console.error(err)
+  //   } finally {
+  //     setIsSyncing(false)
+  //   }
+  // }
 
   // Create category
   const createCategory = async () => {
