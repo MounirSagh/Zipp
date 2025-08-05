@@ -19,7 +19,7 @@ function CuisinePanel() {
         setConfirmedOrders([])
         return
       }
-      const response = await fetch(`http://localhost:3000/api/orders/${user.id}`)
+      const response = await fetch(`https://zipp-backend.vercel.app/api/orders/${user.id}`)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -56,7 +56,7 @@ function CuisinePanel() {
 
   const updateOrderStatus = async (id: number, status: string) => {
     try {
-      const response = await fetch("http://localhost:3000/api/orders/update-status", {
+      const response = await fetch("https://zipp-backend.vercel.app/api/orders/update-status", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ function CuisinePanel() {
 
   const sendSMS = async (to: string, message: string) => {
     try {
-      const response = await fetch("http://localhost:3000/api/sms/send-sms", {
+      const response = await fetch("https://zipp-backend.vercel.app/api/sms/send-sms", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

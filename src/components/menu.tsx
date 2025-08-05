@@ -46,7 +46,7 @@ function Menu() {
     categoryId: "",
   })
 
-  const API_BASE = "http://localhost:3000/api/menu"
+  const API_BASE = "https://zipp-backend.vercel.app/api/menu"
 
   // Auto-clear messages
   useEffect(() => {

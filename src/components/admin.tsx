@@ -19,7 +19,7 @@ function Admin() {
   const fetchOrders = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`http://localhost:3000/api/orders/${user?.id}`, {
+      const response = await fetch(`https://zipp-backend.vercel.app/api/orders/${user?.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -37,7 +37,7 @@ function Admin() {
 
   const sendSMS = async (to: string, message: string) => {
     try {
-      await fetch("http://localhost:3000/api/sms/send-sms", {
+      await fetch("https://zipp-backend.vercel.app/api/sms/send-sms", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +51,7 @@ function Admin() {
 
   const updateOrderStatus = async (id: number, status: string) => {
     try {
-      await fetch("http://localhost:3000/api/orders/update-status", {
+      await fetch("https://zipp-backend.vercel.app/api/orders/update-status", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
