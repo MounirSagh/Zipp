@@ -25,7 +25,7 @@ function Admin() {
           "Content-Type": "application/json",
         },
       })
-      console.log(response)
+      console.log(response , 'hhhhhhha')
       const data = await response.json()
       setOrders(data)
     } catch (err: any) {
