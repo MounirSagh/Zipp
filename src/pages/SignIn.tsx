@@ -47,7 +47,7 @@ export default function Home() {
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
               <Button className="mt-10 px-8 py-3 text-base md:text-lg font-medium transition-transform hover:scale-105 bg-gradient-to-br from-blue-300 via-blue-100 to-blue-300 text-black">
-                Sign In
+                Get Started
               </Button>
             </DialogTrigger>
             <DialogContent className="border-none bg-transparent p-6 rounded-2xl shadow-xl flex justify-center items-center">

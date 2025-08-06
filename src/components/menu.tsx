@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Plus, Edit2, Trash2, Save, X, ShoppingCart, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog" // Assuming Dialog components are available
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useUser } from "@clerk/clerk-react"
 
 function Menu() {
@@ -13,13 +13,19 @@ function Menu() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
+  // Action loading states
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false)
+  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false)
+  const [isDeletingCategory, setIsDeletingCategory] = useState<number | null>(null)
+  const [isCreatingItem, setIsCreatingItem] = useState(false)
+  const [isUpdatingItem, setIsUpdatingItem] = useState(false)
+  const [isDeletingItem, setIsDeletingItem] = useState<number | null>(null)
+  const [isTogglingAvailability, setIsTogglingAvailability] = useState<number | null>(null)
+
   // Search state
   const [searchQuery, ] = useState("")
   const [searchResults, ] = useState<any[]>([])
   const [, ] = useState(false)
-
-  // Sync state
-  // const [isSyncing, setIsSyncing] = useState(false)
 
   // Modal states
   const [showCategoryModal, setShowCategoryModal] = useState(false)
@@ -30,7 +36,6 @@ function Menu() {
   const { isSignedIn, user } = useUser()
   const restaurantId = user?.id
 
-
   // Form states
   const [categoryForm, setCategoryForm] = useState({
     name: "",
@@ -40,7 +45,7 @@ function Menu() {
     name: "",
     description: "",
     price: "",
-    imageUrl: "", // This will be empty for new items
+    imageUrl: "",
     isAvailable: true,
     ingredients: "",
     categoryId: "",
@@ -82,61 +87,10 @@ function Menu() {
     }
   }
 
-  // Search menu using vector database
-  // const searchMenu = async () => {
-  //   if (!searchQuery.trim()) return
-  //   try {
-  //     setIsSearching(true)
-  //     const response = await fetch(`${API_BASE}/search`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         query: searchQuery,
-  //         restaurantId: restaurantId,
-  //         topK: 10,
-  //       }),
-  //     })
-  //     const data = await response.json()
-  //     if (data.success) {
-  //       setSearchResults(data.data)
-  //       setShowSearchModal(true)
-  //     } else {
-  //       setError(data.error || "Search failed")
-  //     }
-  //   } catch (err) {
-  //     setError("Network error while searching")
-  //     console.error(err)
-  //   } finally {
-  //     setIsSearching(false)
-  //   }
-  // }
-
-  // Sync existing data to vector database
-  // const syncToVectorDB = async () => {
-  //   try {
-  //     setIsSyncing(true)
-  //     const response = await fetch(`${API_BASE}/sync`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ restaurantId }),
-  //     })
-  //     const data = await response.json()
-  //     if (data.success) {
-  //       setSuccess(`Successfully synced ${data.categoriesCount} categories to vector database`)
-  //     } else {
-  //       setError(data.error || "Sync failed")
-  //     }
-  //   } catch (err) {
-  //     setError("Network error while syncing")
-  //     console.error(err)
-  //   } finally {
-  //     setIsSyncing(false)
-  //   }
-  // }
-
   // Create category
   const createCategory = async () => {
     try {
+      setIsCreatingCategory(true)
       const response = await fetch(`${API_BASE}/category`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -157,12 +111,15 @@ function Menu() {
     } catch (err) {
       setError("Network error while creating category")
       console.error(err)
+    } finally {
+      setIsCreatingCategory(false)
     }
   }
 
   // Update category
   const updateCategory = async () => {
     try {
+      setIsUpdatingCategory(true)
       const response = await fetch(`${API_BASE}/category/${editingCategory.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -181,6 +138,8 @@ function Menu() {
     } catch (err) {
       setError("Network error while updating category")
       console.error(err)
+    } finally {
+      setIsUpdatingCategory(false)
     }
   }
 
@@ -194,6 +153,7 @@ function Menu() {
       return
     }
     try {
+      setIsDeletingCategory(categoryId)
       const response = await fetch(`${API_BASE}/category/${categoryId}`, {
         method: "DELETE",
       })
@@ -207,12 +167,15 @@ function Menu() {
     } catch (err) {
       setError("Network error while deleting category")
       console.error(err)
+    } finally {
+      setIsDeletingCategory(null)
     }
   }
 
   // Create item
   const createItem = async () => {
     try {
+      setIsCreatingItem(true)
       const response = await fetch(`${API_BASE}/item`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -230,7 +193,7 @@ function Menu() {
           name: "",
           description: "",
           price: "",
-          imageUrl: "", // Ensure this is empty for new items
+          imageUrl: "",
           isAvailable: true,
           ingredients: "",
           categoryId: "",
@@ -242,12 +205,15 @@ function Menu() {
     } catch (err) {
       setError("Network error while creating item")
       console.error(err)
+    } finally {
+      setIsCreatingItem(false)
     }
   }
 
   // Update item
   const updateItem = async () => {
     try {
+      setIsUpdatingItem(true)
       const response = await fetch(`${API_BASE}/item/${editingItem.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -266,7 +232,7 @@ function Menu() {
           name: "",
           description: "",
           price: "",
-          imageUrl: "", // Keep it empty or set to existing if needed for editing
+          imageUrl: "",
           isAvailable: true,
           ingredients: "",
           categoryId: "",
@@ -278,6 +244,8 @@ function Menu() {
     } catch (err) {
       setError("Network error while updating item")
       console.error(err)
+    } finally {
+      setIsUpdatingItem(false)
     }
   }
 
@@ -287,6 +255,7 @@ function Menu() {
       return
     }
     try {
+      setIsDeletingItem(itemId)
       const response = await fetch(`${API_BASE}/item/${itemId}`, {
         method: "DELETE",
       })
@@ -300,12 +269,15 @@ function Menu() {
     } catch (err) {
       setError("Network error while deleting item")
       console.error(err)
+    } finally {
+      setIsDeletingItem(null)
     }
   }
 
   // Toggle item availability
   const toggleAvailability = async (item: any) => {
     try {
+      setIsTogglingAvailability(item.id)
       const response = await fetch(`${API_BASE}/item/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -323,6 +295,8 @@ function Menu() {
     } catch (err) {
       setError("Network error while updating availability")
       console.error(err)
+    } finally {
+      setIsTogglingAvailability(null)
     }
   }
 
@@ -348,7 +322,7 @@ function Menu() {
         name: item.name,
         description: item.description || "",
         price: item.price.toString(),
-        imageUrl: item.imageUrl || "", // Keep existing URL for editing
+        imageUrl: item.imageUrl || "",
         isAvailable: item.isAvailable,
         ingredients: item.ingredients || "",
         categoryId: item.categoryId.toString(),
@@ -359,7 +333,7 @@ function Menu() {
         name: "",
         description: "",
         price: "",
-        imageUrl: "", // Always empty for new items
+        imageUrl: "",
         isAvailable: true,
         ingredients: "",
         categoryId: categoryId.toString(),
@@ -407,14 +381,6 @@ function Menu() {
               <p className="text-gray-600 text-lg">Manage your restaurant menu </p>
             </div>
             <div className="flex gap-3">
-              {/* <Button
-                onClick={syncToVectorDB}
-                disabled={isSyncing}
-                className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50"
-              >
-                {isSyncing ? <RefreshCw size={16} className="animate-spin" /> : <Database size={16} />}
-                {isSyncing ? "Syncing..." : "Sync Vector DB"}
-              </Button> */}
               <Button
                 onClick={() => openCategoryModal()}
                 className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 flex items-center gap-2"
@@ -424,28 +390,6 @@ function Menu() {
               </Button>
             </div>
           </div>
-          {/* Search Bar */}
-          {/* <div className="flex gap-3 mt-6">
-            <div className="flex-1 relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && searchMenu()}
-                placeholder="Search menu items using AI (e.g., 'vegetarian pasta dishes under $15')"
-                className="w-full border border-gray-200 rounded-full px-4 py-2 pr-10 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400"
-              />
-              <Search size={20} className="absolute right-3 top-2.5 text-gray-400" />
-            </div>
-            <Button
-              onClick={searchMenu}
-              disabled={isSearching || !searchQuery.trim()}
-              className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2"
-            >
-              {isSearching ? <RefreshCw size={16} className="animate-spin" /> : <Search size={16} />}
-              Search
-            </Button>
-          </div> */}
         </div>
 
         {/* Messages */}
@@ -519,8 +463,13 @@ function Menu() {
                         variant="ghost"
                         size="icon"
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
+                        disabled={isDeletingCategory === category.id}
                       >
-                        <Trash2 size={16} />
+                        {isDeletingCategory === category.id ? (
+                          <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 size={16} />
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -577,13 +526,16 @@ function Menu() {
                           <div className="flex justify-between items-center">
                             <Button
                               onClick={() => toggleAvailability(item)}
-                              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                              disabled={isTogglingAvailability === item.id}
+                              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors disabled:opacity-50 ${
                                 item.isAvailable
                                   ? "bg-green-100 text-green-800 hover:bg-green-200"
                                   : "bg-red-100 text-red-800 hover:bg-red-200"
                               }`}
                             >
-                              {item.isAvailable ? (
+                              {isTogglingAvailability === item.id ? (
+                                <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin inline mr-1" />
+                              ) : item.isAvailable ? (
                                 <>
                                   <Eye size={12} className="inline mr-1" />
                                   Available
@@ -609,8 +561,13 @@ function Menu() {
                                 variant="ghost"
                                 size="icon"
                                 className="text-red-600 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
+                                disabled={isDeletingItem === item.id}
                               >
-                                <Trash2 size={14} />
+                                {isDeletingItem === item.id ? (
+                                  <div className="w-3.5 h-3.5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <Trash2 size={14} />
+                                )}
                               </Button>
                             </div>
                           </div>
@@ -716,10 +673,14 @@ function Menu() {
               <Button
                 onClick={editingCategory ? updateCategory : createCategory}
                 className="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50"
-                disabled={!categoryForm.name.trim()}
+                disabled={!categoryForm.name.trim() || isCreatingCategory || isUpdatingCategory}
               >
-                <Save size={16} />
-                {editingCategory ? "Update" : "Create"}
+                {(isCreatingCategory || isUpdatingCategory) ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Save size={16} />
+                )}
+                {editingCategory ? (isUpdatingCategory ? "Updating..." : "Update") : (isCreatingCategory ? "Creating..." : "Create")}
               </Button>
             </div>
           </DialogContent>
@@ -781,16 +742,6 @@ function Menu() {
                   placeholder="Describe this menu item"
                 />
               </div>
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                <input
-                  type="url"
-                  value={itemForm.imageUrl}
-                  onChange={(e) => setItemForm({ ...itemForm, imageUrl: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div> */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Ingredients</label>
                 <input
@@ -837,10 +788,14 @@ function Menu() {
               <Button
                 onClick={editingItem ? updateItem : createItem}
                 className="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50"
-                disabled={!itemForm.name.trim() || !itemForm.price || !itemForm.categoryId}
+                disabled={!itemForm.name.trim() || !itemForm.price || !itemForm.categoryId || isCreatingItem || isUpdatingItem}
               >
-                <Save size={16} />
-                {editingItem ? "Update" : "Create"}
+                {(isCreatingItem || isUpdatingItem) ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Save size={16} />
+                )}
+                {editingItem ? (isUpdatingItem ? "Updating..." : "Update") : (isCreatingItem ? "Creating..." : "Create")}
               </Button>
             </div>
           </DialogContent>
