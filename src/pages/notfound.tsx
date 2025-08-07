@@ -1,5 +1,4 @@
 import { BackgroundBeams } from "@/components/ui/background-beams";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 function NotFound() {
