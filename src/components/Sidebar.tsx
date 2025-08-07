@@ -59,7 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const {signOut} = useClerk()
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props} >
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center justify-center gap-2 py-2">
           <div

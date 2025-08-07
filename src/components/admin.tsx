@@ -222,7 +222,7 @@ function Admin() {
                                       <span>×</span>
                                       <span>{item.quantity}</span>
                                       <span className="text-gray-800 font-semibold min-w-[80px] text-right">
-                                        {(item.price * item.quantity).toFixed(2)} MAD
+                                        {(item.price * item.quantity).toFixed(2)} $
                                       </span>
                                     </div>
                                   </div>
