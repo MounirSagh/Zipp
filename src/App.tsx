@@ -3,6 +3,7 @@ import Admin from './pages/admin';
 import CuisinePanel from './pages/cuisine';
 import SignIn from './pages/SignIn'
 import Menu from './pages/menu';
+import NotFound from './pages/notfound';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/cuisine" element={<CuisinePanel />} />
         <Route path="/menu" element={<Menu />} />
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </Router>
   );
