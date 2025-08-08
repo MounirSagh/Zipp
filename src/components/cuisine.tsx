@@ -189,7 +189,7 @@ function CuisinePanel() {
                         }`}
                       >
                         <Clock className="w-3 h-3" />
-                        <span>{getTimeSinceOrder(order.orderDate)}</span>
+                        <span>{getTimeSinceOrder(order.orderTime)}</span>
                       </div>
                     </div>
                   </CardHeader>
@@ -197,7 +197,7 @@ function CuisinePanel() {
                     <div className="space-y-2">
                       {order.orderItems.map((item: any, i: number) => (
                         <div key={i} className="flex justify-between items-center text-base">
-                          <div className="font-medium text-black">{item.item}</div> {/* Matched admin.tsx item font */}
+                          <div className="font-medium text-black">{item.name}</div> {/* Matched admin.tsx item font */}
                           <div className="text-gray-600">x{item.quantity}</div> {/* Matched admin.tsx quantity font */}
                         </div>
                       ))}

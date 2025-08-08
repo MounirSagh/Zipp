@@ -215,7 +215,7 @@ function Admin() {
                                     key={idx}
                                     className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0"
                                   >
-                                    <span className="text-black">{item.item}</span>
+                                    <span className="text-black">{item.name}</span>
                                     <div className="flex items-center space-x-4 text-gray-500">
                                       <span>{item.price} $</span>
                                       <span>×</span>
