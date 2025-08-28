@@ -144,6 +144,7 @@ function Admin() {
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-gray-100 hover:bg-transparent">
+                  <TableHead className="font-semibold text-gray-600 py-4 px-6">Full Name</TableHead>
                   <TableHead className="font-semibold text-gray-600 py-4 px-6">Phone</TableHead>
                   <TableHead className="font-semibold text-gray-600 py-4">Date</TableHead>
                   <TableHead className="font-semibold text-gray-600 py-4">Total</TableHead>
@@ -159,6 +160,9 @@ function Admin() {
                         index === orders.length - 1 && expandedOrderId !== order.id ? "border-b-0" : ""
                       }`}
                     >
+                      <TableCell className="py-4 px-6">
+                        <span className="text-gray-800 font-semibold">{order.firstName} {' '} {order.lastName}</span>
+                      </TableCell>
                       <TableCell className="py-4 px-6">
                         <span className="text-gray-800 font-semibold">{order.phoneNumber}</span>
                       </TableCell>
