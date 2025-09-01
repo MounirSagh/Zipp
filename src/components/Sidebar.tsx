@@ -18,11 +18,12 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { Box,  Home, Users } from "lucide-react";
+import { Box,  Home, LayoutDashboard, Users } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 
 // Navigation items
 const mainNavItems = [
+  { path: "/analytics", label: "Dashboard", icon: LayoutDashboard },
   { path: "/admin", label: "Orders", icon: Home },
   { path: "/cuisine", label: "Cuisine", icon: Users },
   { path: "/menu", label: "Menu", icon: Box },

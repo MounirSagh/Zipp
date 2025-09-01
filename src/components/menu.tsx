@@ -74,6 +74,7 @@ function Menu() {
       setLoading(true)
       const response = await fetch(`${API_BASE}/${restaurantId}`)
       const data = await response.json()
+      console.log(data)
       if (data.success) {
         setMenu(data.data)
       } else {
