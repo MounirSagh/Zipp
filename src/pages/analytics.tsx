@@ -349,7 +349,7 @@ function Analytics() {
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
             <p className="text-muted-foreground">
-              Restaurant insights from{" "}
+              Business insights from{" "}
               {format(new Date(startDate), "MMM dd, yyyy")} to{" "}
               {format(new Date(endDate), "MMM dd, yyyy")}
             </p>

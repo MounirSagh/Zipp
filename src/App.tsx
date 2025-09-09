@@ -11,10 +11,10 @@ function App() {
     <Router>
       <Routes>
         <Route path='/' element={<SignIn /> } />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/orders" element={<Admin />} />
         <Route path="/cuisine" element={<CuisinePanel />} />
-        <Route path="/menu" element={<Menu />} />
-        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/inventory" element={<Menu />} />
+        <Route path="/dashboard" element={<Analytics />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
     </Router>

@@ -52,7 +52,7 @@ export default function Home() {
             </DialogTrigger>
             <DialogContent className="border-none bg-transparent p-6 rounded-2xl shadow-xl flex justify-center items-center">
               <SignIn
-                afterSignInUrl="/analytics"
+                afterSignInUrl="/dashboard"
               />
             </DialogContent>
           </Dialog>

@@ -130,7 +130,7 @@ function Admin() {
       <div className="border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <h1 className="text-4xl font-light text-black mb-2">Orders</h1>
-          <p className="text-gray-600 text-lg">Manage your restaurant orders</p>
+          <p className="text-gray-600 text-lg">Manage your business orders</p>
         </div>
       </div>
       <div className="max-w-6xl mx-auto px-6 py-12">

@@ -18,15 +18,15 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { Box,  Home, LayoutDashboard, Users } from "lucide-react";
-import { useClerk } from "@clerk/clerk-react";
+import { Box, ChefHat, ClipboardList, LayoutDashboard } from "lucide-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
 
 // Navigation items
 const mainNavItems = [
-  { path: "/analytics", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/admin", label: "Orders", icon: Home },
-  { path: "/cuisine", label: "Cuisine", icon: Users },
-  { path: "/menu", label: "Menu", icon: Box },
+  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/orders", label: "Orders", icon: ClipboardList },
+  { path: "/cuisine", label: "Cuisine", icon: ChefHat },
+  { path: "/inventory", label: "Inventory", icon: Box },
 ];
 
 // Navigation item component
@@ -57,10 +57,22 @@ function SidebarNavItem({
 // Sidebar component
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar();
-  const {signOut} = useClerk()
+  const { signOut } = useClerk();
+  const { user } = useUser();
+
+  // Filter out cuisine for wholesellers
+  const filteredNavItems = mainNavItems.filter((item) => {
+    if (
+      item.path === "/cuisine" &&
+      user?.publicMetadata.type === "wholeseller"
+    ) {
+      return false;
+    }
+    return true;
+  });
 
   return (
-    <Sidebar collapsible="icon" {...props} >
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center justify-center gap-2 py-2">
           <div
@@ -81,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {mainNavItems.map((item) => (
+              {filteredNavItems.map((item) => (
                 <SidebarNavItem key={item.path} {...item} />
               ))}
             </SidebarMenu>

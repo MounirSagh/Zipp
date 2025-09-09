@@ -354,7 +354,7 @@ function Menu() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center p-8 rounded-lg shadow-sm bg-white">
           <h2 className="text-2xl font-light text-gray-700 mb-2">Sign In Required</h2>
-          <p className="text-gray-500 font-light">Please sign in to view the kitchen panel.</p>
+          <p className="text-gray-500 font-light">Please sign in to view the business panel.</p>
         </div>
       </div>
     )
@@ -378,8 +378,8 @@ function Menu() {
         <div className="border-b border-gray-100 pb-12 mb-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-4xl font-light text-black mb-2">Menu</h1>
-              <p className="text-gray-600 text-lg">Manage your restaurant menu </p>
+              <h1 className="text-4xl font-light text-black mb-2">Inventory</h1>
+              <p className="text-gray-600 text-lg">Manage your business inventory </p>
             </div>
             <div className="flex gap-3">
               <Button
