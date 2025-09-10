@@ -14,6 +14,7 @@ function App() {
         <Route path="/orders" element={<Admin />} />
         <Route path="/cuisine" element={<CuisinePanel />} />
         <Route path="/inventory" element={<Menu />} />
+        <Route path="/menu" element={<Menu />} />
         <Route path="/dashboard" element={<Analytics />} />
         <Route path='*' element={<NotFound />} />
       </Routes>

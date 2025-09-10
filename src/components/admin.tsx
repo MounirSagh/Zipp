@@ -1,38 +1,54 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ChevronDown, ChevronUp } from "lucide-react"
-import { useUser } from "@clerk/clerk-react"
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
 
 function Admin() {
-  const [orders, setOrders] = useState<any[]>([])
-  const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null)
-  const [rejectingOrderId, setRejectingOrderId] = useState<number | null>(null)
-  const [rejectionReason, setRejectionReason] = useState("")
-  const [loading, setLoading] = useState(true)
-  const { isSignedIn, user } = useUser()
+  const [orders, setOrders] = useState<any[]>([]);
+  const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
+  const [rejectingOrderId, setRejectingOrderId] = useState<number | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [loading, setLoading] = useState(true);
+  const { isSignedIn, user } = useUser();
 
   const fetchOrders = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`https://zipp-backend.vercel.app/api/orders/${user?.id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      const data = await response.json()
-      setOrders(data)
+      setLoading(true);
+      const response = await fetch(
+        `https://zipp-backend.vercel.app/api/orders/${user?.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      setOrders(data);
     } catch (err: any) {
-      alert("Error fetching orders: " + err.message)
+      alert("Error fetching orders: " + err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const sendSMS = async (to: string, message: string) => {
     try {
@@ -42,11 +58,11 @@ function Admin() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ to, text: message }),
-      })
+      });
     } catch (error) {
-      console.error("SMS sending failed", error)
+      console.error("SMS sending failed", error);
     }
-  }
+  };
 
   const updateOrderStatus = async (id: number, status: string) => {
     try {
@@ -56,17 +72,17 @@ function Admin() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ id, status }),
-      })
+      });
     } catch (err) {
-      console.error("Failed to update order status", err)
+      console.error("Failed to update order status", err);
     }
-  }
+  };
 
   const handleConfirm = async (orderId: number, phone: string) => {
-    await updateOrderStatus(orderId, "confirmed")
-    await sendSMS(phone, `Your order #${orderId} has been confirmed! ✅`)
-    fetchOrders()
-  }
+    await updateOrderStatus(orderId, "confirmed");
+    await sendSMS(phone, `Your order #${orderId} has been confirmed! ✅`);
+    fetchOrders();
+  };
 
   // const handleReady = async (orderId: number, phone: string) => {
   //   await updateOrderStatus(orderId, "ready")
@@ -75,42 +91,55 @@ function Admin() {
   // }
 
   const handleReject = async (orderId: number, phone: string) => {
-    await updateOrderStatus(orderId, "rejected")
+    await updateOrderStatus(orderId, "rejected");
     await sendSMS(
       phone,
-      `Unfortunately, your order has been rejected. ${rejectionReason ? "Reason: " + rejectionReason : ""} ❌`,
-    )
-    alert(`Order ${orderId} rejected.`)
-    setRejectingOrderId(null)
-    setRejectionReason("")
-    fetchOrders()
-  }
+      `Unfortunately, your order has been rejected. ${
+        rejectionReason ? "Reason: " + rejectionReason : ""
+      } ❌`
+    );
+    alert(`Order ${orderId} rejected.`);
+    setRejectingOrderId(null);
+    setRejectionReason("");
+    fetchOrders();
+  };
 
   const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
       case "pending":
-        return "bg-yellow-50 text-yellow-700 border-yellow-100"
+        return "bg-yellow-50 text-yellow-700 border-yellow-100";
       case "confirmed":
-        return "bg-blue-50 text-blue-700 border-blue-100"
+        return "bg-blue-50 text-blue-700 border-blue-100";
       case "ready":
-        return "bg-green-50 text-green-700 border-green-100"
+        return "bg-green-50 text-green-700 border-green-100";
       case "completed":
-        return "bg-gray-50 text-gray-700 border-gray-100"
+        return "bg-gray-50 text-gray-700 border-gray-100";
       case "rejected":
-        return "bg-red-50 text-red-700 border-red-100"
+        return "bg-red-50 text-red-700 border-red-100";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   useEffect(() => {
     if (isSignedIn && user?.id) {
-      fetchOrders()
+      fetchOrders();
     }
-  }, [isSignedIn, user])
+  }, [isSignedIn, user]);
 
   if (!isSignedIn) {
-    return <div>Sign in to view this page</div>
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center p-8 rounded-lg shadow-sm bg-white">
+          <h2 className="text-2xl font-light text-gray-700 mb-2">
+            Sign In Required
+          </h2>
+          <p className="text-gray-500 font-light">
+            Please sign in to view the admin panel.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (loading) {
@@ -121,7 +150,7 @@ function Admin() {
           <p className="text-gray-500 text-sm">Loading orders...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -130,25 +159,45 @@ function Admin() {
       <div className="border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <h1 className="text-4xl font-light text-black mb-2">Orders</h1>
-          <p className="text-gray-600 text-lg">Manage your business orders</p>
+          <p className="text-gray-600 text-lg">
+            Manage your{" "}
+            {user?.publicMetadata.type === "wholeseller"
+              ? "business"
+              : "restaurant"}{" "}
+            orders
+          </p>
         </div>
       </div>
       <div className="max-w-6xl mx-auto px-6 py-12">
         {orders.length === 0 ? (
           <div className="text-center py-20">
-            <h3 className="text-2xl font-normal text-gray-800 mb-2">No orders yet</h3>
-            <p className="text-gray-500">New orders will appear here when customers place them.</p>
+            <h3 className="text-2xl font-normal text-gray-800 mb-2">
+              No orders yet
+            </h3>
+            <p className="text-gray-500">
+              New orders will appear here when customers place them.
+            </p>
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-gray-100 hover:bg-transparent">
-                  <TableHead className="font-semibold text-gray-600 py-4 px-6">Full Name</TableHead>
-                  <TableHead className="font-semibold text-gray-600 py-4 px-6">Phone</TableHead>
-                  <TableHead className="font-semibold text-gray-600 py-4">Date</TableHead>
-                  <TableHead className="font-semibold text-gray-600 py-4">Total</TableHead>
-                  <TableHead className="font-semibold text-gray-600 py-4">Status</TableHead>
+                  <TableHead className="font-semibold text-gray-600 py-4 px-6">
+                    Full Name
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-600 py-4 px-6">
+                    Phone
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-600 py-4">
+                    Date
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-600 py-4">
+                    Total
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-600 py-4">
+                    Status
+                  </TableHead>
                   <TableHead className="font-semibold text-gray-600 py-4"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -157,31 +206,43 @@ function Admin() {
                   <React.Fragment key={order.id}>
                     <TableRow
                       className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                        index === orders.length - 1 && expandedOrderId !== order.id ? "border-b-0" : ""
+                        index === orders.length - 1 &&
+                        expandedOrderId !== order.id
+                          ? "border-b-0"
+                          : ""
                       }`}
                     >
                       <TableCell className="py-4 px-6">
-                        <span className="text-gray-800 font-semibold">{order.firstName} {' '} {order.lastName}</span>
+                        <span className="text-gray-800 font-semibold">
+                          {order.firstName} {order.lastName}
+                        </span>
                       </TableCell>
                       <TableCell className="py-4 px-6">
-                        <span className="text-gray-800 font-semibold">{order.phoneNumber}</span>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <span className="text-gray-500">
-                          {new Date(order.orderDate).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                        <span className="text-gray-800 font-semibold">
+                          {order.phoneNumber}
                         </span>
                       </TableCell>
                       <TableCell className="py-4">
-                        <span className="text-gray-800 font-semibold">{order.totalAmount} $</span>
+                        <span className="text-gray-500">
+                          {new Date(order.orderDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            }
+                          )}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <span className="text-gray-800 font-semibold">
+                          {order.totalAmount} $
+                        </span>
                       </TableCell>
                       <TableCell className="py-4">
                         <Badge
                           className={`${getStatusStyle(
-                            order.status,
+                            order.status
                           )} border font-medium px-3 py-1 rounded-full text-sm capitalize`}
                         >
                           {order.status}
@@ -191,7 +252,11 @@ function Admin() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+                          onClick={() =>
+                            setExpandedOrderId(
+                              expandedOrderId === order.id ? null : order.id
+                            )
+                          }
                           className="text-gray-600 hover:text-gray-800 hover:bg-gray-100 font-medium px-4"
                         >
                           {expandedOrderId === order.id ? (
@@ -212,43 +277,60 @@ function Admin() {
                           <div className="bg-gray-50/30 px-6 py-8 space-y-8">
                             {/* Items */}
                             <div>
-                              <h4 className="text-lg font-medium text-black mb-4">Items</h4>
+                              <h4 className="text-lg font-medium text-black mb-4">
+                                Items
+                              </h4>
                               <div className="space-y-3">
-                                {order.orderItems?.map((item: any, idx: number) => (
-                                  <div
-                                    key={idx}
-                                    className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0"
-                                  >
-                                    <span className="text-black">{item.name}</span>
-                                    <div className="flex items-center space-x-4 text-gray-500">
-                                      <span>{item.price} $</span>
-                                      <span>×</span>
-                                      <span>{item.quantity}</span>
-                                      <span className="text-gray-800 font-semibold min-w-[80px] text-right">
-                                        {(item.price * item.quantity).toFixed(2)} $
+                                {order.orderItems?.map(
+                                  (item: any, idx: number) => (
+                                    <div
+                                      key={idx}
+                                      className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0"
+                                    >
+                                      <span className="text-black">
+                                        {item.name}
                                       </span>
+                                      <div className="flex items-center space-x-4 text-gray-500">
+                                        <span>{item.price} $</span>
+                                        <span>×</span>
+                                        <span>{item.quantity}</span>
+                                        <span className="text-gray-800 font-semibold min-w-[80px] text-right">
+                                          {(item.price * item.quantity).toFixed(
+                                            2
+                                          )}{" "}
+                                          $
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  )
+                                )}
                               </div>
                             </div>
                             {/* Special Instructions */}
                             {order.specialInstructions && (
                               <div>
-                                <h4 className="text-lg font-medium text-black mb-3">Special Instructions</h4>
+                                <h4 className="text-lg font-medium text-black mb-3">
+                                  Special Instructions
+                                </h4>
                                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                                  <p className="text-blue-800">{order.specialInstructions}</p>
+                                  <p className="text-blue-800">
+                                    {order.specialInstructions}
+                                  </p>
                                 </div>
                               </div>
                             )}
                             {/* Actions */}
                             <div className="flex space-x-3 pt-4">
                               <Button
-                                onClick={() => handleConfirm(order.id, order.phoneNumber)}
-                                disabled={order.status.toLowerCase() === "ready"}
+                                onClick={() =>
+                                  handleConfirm(order.id, order.phoneNumber)
+                                }
+                                disabled={
+                                  order.status.toLowerCase() === "ready"
+                                }
                                 className={`bg-blue-600 text-white hover:bg-blue-700 rounded-lg px-6 py-2 font-medium transition-colors ${
-                                  order.status.toLowerCase() === "ready" 
-                                    ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400" 
+                                  order.status.toLowerCase() === "ready"
+                                    ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400"
                                     : ""
                                 }`}
                               >
@@ -256,15 +338,19 @@ function Admin() {
                               </Button>
                               <Dialog
                                 open={rejectingOrderId === order.id}
-                                onOpenChange={(open) => setRejectingOrderId(open ? order.id : null)}
+                                onOpenChange={(open) =>
+                                  setRejectingOrderId(open ? order.id : null)
+                                }
                               >
                                 <DialogTrigger asChild>
                                   <Button
                                     variant="outline"
-                                    disabled={order.status.toLowerCase() === "ready"}
+                                    disabled={
+                                      order.status.toLowerCase() === "ready"
+                                    }
                                     className={`border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-lg px-6 py-2 font-medium transition-colors bg-transparent ${
-                                      order.status.toLowerCase() === "ready" 
-                                        ? "opacity-50 cursor-not-allowed border-gray-300 text-gray-400 hover:bg-transparent hover:border-gray-300" 
+                                      order.status.toLowerCase() === "ready"
+                                        ? "opacity-50 cursor-not-allowed border-gray-300 text-gray-400 hover:bg-transparent hover:border-gray-300"
                                         : ""
                                     }`}
                                   >
@@ -278,26 +364,35 @@ function Admin() {
                                     </DialogTitle>
                                   </DialogHeader>
                                   <div className="space-y-6">
-                                    <p className="text-gray-600">Why are you rejecting this order?</p>
+                                    <p className="text-gray-600">
+                                      Why are you rejecting this order?
+                                    </p>
                                     <textarea
                                       placeholder="Optional reason..."
                                       value={rejectionReason}
-                                      onChange={(e) => setRejectionReason(e.target.value)}
+                                      onChange={(e) =>
+                                        setRejectionReason(e.target.value)
+                                      }
                                       className="w-full h-24 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-black placeholder-gray-400 bg-white"
                                     />
                                     <div className="flex justify-end space-x-3 pt-2">
                                       <Button
                                         variant="outline"
                                         onClick={() => {
-                                          setRejectingOrderId(null)
-                                          setRejectionReason("")
+                                          setRejectingOrderId(null);
+                                          setRejectionReason("");
                                         }}
                                         className="rounded-full px-6 py-2 font-medium border-gray-200 text-gray-600 hover:bg-gray-50"
                                       >
                                         Cancel
                                       </Button>
                                       <Button
-                                        onClick={() => handleReject(order.id, order.phoneNumber)}
+                                        onClick={() =>
+                                          handleReject(
+                                            order.id,
+                                            order.phoneNumber
+                                          )
+                                        }
                                         className="bg-red-600 text-white hover:bg-red-700 rounded-full px-6 py-2 font-medium transition-colors"
                                       >
                                         Reject Order
@@ -319,7 +414,7 @@ function Admin() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default Admin
+export default Admin;

@@ -1,46 +1,64 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Plus, Edit2, Trash2, Save, X, ShoppingCart, Eye, EyeOff } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { useUser } from "@clerk/clerk-react"
+import { useState, useEffect } from "react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Save,
+  X,
+  ShoppingCart,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useUser } from "@clerk/clerk-react";
 
 function Menu() {
-  const [menu, setMenu] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
+  const [menu, setMenu] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Action loading states
-  const [isCreatingCategory, setIsCreatingCategory] = useState(false)
-  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false)
-  const [isDeletingCategory, setIsDeletingCategory] = useState<number | null>(null)
-  const [isCreatingItem, setIsCreatingItem] = useState(false)
-  const [isUpdatingItem, setIsUpdatingItem] = useState(false)
-  const [isDeletingItem, setIsDeletingItem] = useState<number | null>(null)
-  const [isTogglingAvailability, setIsTogglingAvailability] = useState<number | null>(null)
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
+  const [isDeletingCategory, setIsDeletingCategory] = useState<number | null>(
+    null
+  );
+  const [isCreatingItem, setIsCreatingItem] = useState(false);
+  const [isUpdatingItem, setIsUpdatingItem] = useState(false);
+  const [isDeletingItem, setIsDeletingItem] = useState<number | null>(null);
+  const [isTogglingAvailability, setIsTogglingAvailability] = useState<
+    number | null
+  >(null);
 
   // Search state
-  const [searchQuery, ] = useState("")
-  const [searchResults, ] = useState<any[]>([])
-  const [, ] = useState(false)
+  const [searchQuery] = useState("");
+  const [searchResults] = useState<any[]>([]);
+  const [,] = useState(false);
 
   // Modal states
-  const [showCategoryModal, setShowCategoryModal] = useState(false)
-  const [showItemModal, setShowItemModal] = useState(false)
-  const [showSearchModal, setShowSearchModal] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<any>(null)
-  const [editingItem, setEditingItem] = useState<any>(null)
-  const { isSignedIn, user } = useUser()
-  const restaurantId = user?.id
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showItemModal, setShowItemModal] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const { isSignedIn, user } = useUser();
+  const restaurantId = user?.id;
 
   // Form states
   const [categoryForm, setCategoryForm] = useState({
     name: "",
     description: "",
-  })
+  });
   const [itemForm, setItemForm] = useState({
     name: "",
     description: "",
@@ -49,49 +67,49 @@ function Menu() {
     isAvailable: true,
     ingredients: "",
     categoryId: "",
-  })
+  });
 
-  const API_BASE = "https://zipp-backend.vercel.app/api/menu"
+  const API_BASE = "https://zipp-backend.vercel.app/api/menu";
 
   // Auto-clear messages
   useEffect(() => {
     if (error) {
-      const timer = setTimeout(() => setError(""), 5000)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => setError(""), 5000);
+      return () => clearTimeout(timer);
     }
-  }, [error])
+  }, [error]);
 
   useEffect(() => {
     if (success) {
-      const timer = setTimeout(() => setSuccess(""), 3000)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => setSuccess(""), 3000);
+      return () => clearTimeout(timer);
     }
-  }, [success])
+  }, [success]);
 
   // Fetch menu data
   const fetchMenu = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`${API_BASE}/${restaurantId}`)
-      const data = await response.json()
-      console.log(data)
+      setLoading(true);
+      const response = await fetch(`${API_BASE}/${restaurantId}`);
+      const data = await response.json();
+      console.log(data);
       if (data.success) {
-        setMenu(data.data)
+        setMenu(data.data);
       } else {
-        setError(data.error || "Failed to fetch menu")
+        setError(data.error || "Failed to fetch menu");
       }
     } catch (err) {
-      setError("Network error while fetching menu")
-      console.error(err)
+      setError("Network error while fetching menu");
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Create category
   const createCategory = async () => {
     try {
-      setIsCreatingCategory(true)
+      setIsCreatingCategory(true);
       const response = await fetch(`${API_BASE}/category`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -99,84 +117,87 @@ function Menu() {
           ...categoryForm,
           restaurantId,
         }),
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
       if (data.success) {
-        await fetchMenu()
-        setShowCategoryModal(false)
-        setCategoryForm({ name: "", description: "" })
-        setSuccess("Category created and synced to vector database")
+        await fetchMenu();
+        setShowCategoryModal(false);
+        setCategoryForm({ name: "", description: "" });
+        setSuccess("Category created and synced to vector database");
       } else {
-        setError(data.error || "Failed to create category")
+        setError(data.error || "Failed to create category");
       }
     } catch (err) {
-      setError("Network error while creating category")
-      console.error(err)
+      setError("Network error while creating category");
+      console.error(err);
     } finally {
-      setIsCreatingCategory(false)
+      setIsCreatingCategory(false);
     }
-  }
+  };
 
   // Update category
   const updateCategory = async () => {
     try {
-      setIsUpdatingCategory(true)
-      const response = await fetch(`${API_BASE}/category/${editingCategory.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(categoryForm),
-      })
-      const data = await response.json()
+      setIsUpdatingCategory(true);
+      const response = await fetch(
+        `${API_BASE}/category/${editingCategory.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(categoryForm),
+        }
+      );
+      const data = await response.json();
       if (data.success) {
-        await fetchMenu()
-        setShowCategoryModal(false)
-        setEditingCategory(null)
-        setCategoryForm({ name: "", description: "" })
-        setSuccess("Category updated and synced to vector database")
+        await fetchMenu();
+        setShowCategoryModal(false);
+        setEditingCategory(null);
+        setCategoryForm({ name: "", description: "" });
+        setSuccess("Category updated and synced to vector database");
       } else {
-        setError(data.error || "Failed to update category")
+        setError(data.error || "Failed to update category");
       }
     } catch (err) {
-      setError("Network error while updating category")
-      console.error(err)
+      setError("Network error while updating category");
+      console.error(err);
     } finally {
-      setIsUpdatingCategory(false)
+      setIsUpdatingCategory(false);
     }
-  }
+  };
 
   // Delete category
   const deleteCategory = async (categoryId: number) => {
     if (
       !window.confirm(
-        "Are you sure? This will delete all items in this category and remove them from the vector database.",
+        "Are you sure? This will delete all items in this category and remove them from the vector database."
       )
     ) {
-      return
+      return;
     }
     try {
-      setIsDeletingCategory(categoryId)
+      setIsDeletingCategory(categoryId);
       const response = await fetch(`${API_BASE}/category/${categoryId}`, {
         method: "DELETE",
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
       if (data.success) {
-        await fetchMenu()
-        setSuccess("Category deleted and removed from vector database")
+        await fetchMenu();
+        setSuccess("Category deleted and removed from vector database");
       } else {
-        setError(data.error || "Failed to delete category")
+        setError(data.error || "Failed to delete category");
       }
     } catch (err) {
-      setError("Network error while deleting category")
-      console.error(err)
+      setError("Network error while deleting category");
+      console.error(err);
     } finally {
-      setIsDeletingCategory(null)
+      setIsDeletingCategory(null);
     }
-  }
+  };
 
   // Create item
   const createItem = async () => {
     try {
-      setIsCreatingItem(true)
+      setIsCreatingItem(true);
       const response = await fetch(`${API_BASE}/item`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -185,11 +206,11 @@ function Menu() {
           price: Number.parseFloat(itemForm.price),
           categoryId: Number.parseInt(itemForm.categoryId),
         }),
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
       if (data.success) {
-        await fetchMenu()
-        setShowItemModal(false)
+        await fetchMenu();
+        setShowItemModal(false);
         setItemForm({
           name: "",
           description: "",
@@ -198,23 +219,29 @@ function Menu() {
           isAvailable: true,
           ingredients: "",
           categoryId: "",
-        })
-        setSuccess("Menu item created and synced to vector database")
+        });
+        setSuccess(
+          `${
+            user?.publicMetadata.type === "wholeseller"
+              ? "Inventory item"
+              : "Menu item"
+          } created and synced to vector database`
+        );
       } else {
-        setError(data.error || "Failed to create item")
+        setError(data.error || "Failed to create item");
       }
     } catch (err) {
-      setError("Network error while creating item")
-      console.error(err)
+      setError("Network error while creating item");
+      console.error(err);
     } finally {
-      setIsCreatingItem(false)
+      setIsCreatingItem(false);
     }
-  }
+  };
 
   // Update item
   const updateItem = async () => {
     try {
-      setIsUpdatingItem(true)
+      setIsUpdatingItem(true);
       const response = await fetch(`${API_BASE}/item/${editingItem.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -223,12 +250,12 @@ function Menu() {
           price: Number.parseFloat(itemForm.price),
           categoryId: Number.parseInt(itemForm.categoryId),
         }),
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
       if (data.success) {
-        await fetchMenu()
-        setShowItemModal(false)
-        setEditingItem(null)
+        await fetchMenu();
+        setShowItemModal(false);
+        setEditingItem(null);
         setItemForm({
           name: "",
           description: "",
@@ -237,88 +264,104 @@ function Menu() {
           isAvailable: true,
           ingredients: "",
           categoryId: "",
-        })
-        setSuccess("Menu item updated and synced to vector database")
+        });
+        setSuccess(
+          `${
+            user?.publicMetadata.type === "wholeseller"
+              ? "Inventory item"
+              : "Menu item"
+          } updated and synced to vector database`
+        );
       } else {
-        setError(data.error || "Failed to update item")
+        setError(data.error || "Failed to update item");
       }
     } catch (err) {
-      setError("Network error while updating item")
-      console.error(err)
+      setError("Network error while updating item");
+      console.error(err);
     } finally {
-      setIsUpdatingItem(false)
+      setIsUpdatingItem(false);
     }
-  }
+  };
 
   // Delete item
   const deleteItem = async (itemId: number) => {
     if (!window.confirm("Are you sure you want to delete this item?")) {
-      return
+      return;
     }
     try {
-      setIsDeletingItem(itemId)
+      setIsDeletingItem(itemId);
       const response = await fetch(`${API_BASE}/item/${itemId}`, {
         method: "DELETE",
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
       if (data.success) {
-        await fetchMenu()
-        setSuccess("Menu item deleted and removed from vector database")
+        await fetchMenu();
+        setSuccess(
+          `${
+            user?.publicMetadata.type === "wholeseller"
+              ? "Inventory item"
+              : "Menu item"
+          } deleted and removed from vector database`
+        );
       } else {
-        setError(data.error || "Failed to delete item")
+        setError(data.error || "Failed to delete item");
       }
     } catch (err) {
-      setError("Network error while deleting item")
-      console.error(err)
+      setError("Network error while deleting item");
+      console.error(err);
     } finally {
-      setIsDeletingItem(null)
+      setIsDeletingItem(null);
     }
-  }
+  };
 
   // Toggle item availability
   const toggleAvailability = async (item: any) => {
     try {
-      setIsTogglingAvailability(item.id)
+      setIsTogglingAvailability(item.id);
       const response = await fetch(`${API_BASE}/item/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           isAvailable: !item.isAvailable,
         }),
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
       if (data.success) {
-        await fetchMenu()
-        setSuccess(`Item ${!item.isAvailable ? "enabled" : "disabled"} and vector database updated`)
+        await fetchMenu();
+        setSuccess(
+          `Item ${
+            !item.isAvailable ? "enabled" : "disabled"
+          } and vector database updated`
+        );
       } else {
-        setError(data.error || "Failed to update availability")
+        setError(data.error || "Failed to update availability");
       }
     } catch (err) {
-      setError("Network error while updating availability")
-      console.error(err)
+      setError("Network error while updating availability");
+      console.error(err);
     } finally {
-      setIsTogglingAvailability(null)
+      setIsTogglingAvailability(null);
     }
-  }
+  };
 
   // Modal handlers
   const openCategoryModal = (category: any = null) => {
     if (category) {
-      setEditingCategory(category)
+      setEditingCategory(category);
       setCategoryForm({
         name: category.name,
         description: category.description || "",
-      })
+      });
     } else {
-      setEditingCategory(null)
-      setCategoryForm({ name: "", description: "" })
+      setEditingCategory(null);
+      setCategoryForm({ name: "", description: "" });
     }
-    setShowCategoryModal(true)
-  }
+    setShowCategoryModal(true);
+  };
 
   const openItemModal = (item: any = null, categoryId = "") => {
     if (item) {
-      setEditingItem(item)
+      setEditingItem(item);
       setItemForm({
         name: item.name,
         description: item.description || "",
@@ -327,9 +370,9 @@ function Menu() {
         isAvailable: item.isAvailable,
         ingredients: item.ingredients || "",
         categoryId: item.categoryId.toString(),
-      })
+      });
     } else {
-      setEditingItem(null)
+      setEditingItem(null);
       setItemForm({
         name: "",
         description: "",
@@ -338,26 +381,30 @@ function Menu() {
         isAvailable: true,
         ingredients: "",
         categoryId: categoryId.toString(),
-      })
+      });
     }
-    setShowItemModal(true)
-  }
+    setShowItemModal(true);
+  };
 
   useEffect(() => {
-     if (isSignedIn && user?.id) {
-      fetchMenu()
+    if (isSignedIn && user?.id) {
+      fetchMenu();
     }
-  }, [isSignedIn, user?.id])
+  }, [isSignedIn, user?.id]);
 
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center p-8 rounded-lg shadow-sm bg-white">
-          <h2 className="text-2xl font-light text-gray-700 mb-2">Sign In Required</h2>
-          <p className="text-gray-500 font-light">Please sign in to view the business panel.</p>
+          <h2 className="text-2xl font-light text-gray-700 mb-2">
+            Sign In Required
+          </h2>
+          <p className="text-gray-500 font-light">
+            Please sign in to view the panel.
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -368,7 +415,7 @@ function Menu() {
           <p className="text-gray-600 text-sm">Loading orders...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -378,8 +425,17 @@ function Menu() {
         <div className="border-b border-gray-100 pb-12 mb-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-4xl font-light text-black mb-2">Inventory</h1>
-              <p className="text-gray-600 text-lg">Manage your business inventory </p>
+              <h1 className="text-4xl font-light text-black mb-2">
+                {user?.publicMetadata.type === "wholeseller"
+                  ? "Inventory"
+                  : "Menu"}
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Manage your{" "}
+                {user?.publicMetadata.type === "wholeseller"
+                  ? "business inventory"
+                  : "restaurant menu"}
+              </p>
             </div>
             <div className="flex gap-3">
               <Button
@@ -397,7 +453,12 @@ function Menu() {
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center">
             <span>{error}</span>
-            <Button onClick={() => setError("")} variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
+            <Button
+              onClick={() => setError("")}
+              variant="ghost"
+              size="sm"
+              className="text-red-500 hover:text-red-700"
+            >
               <X size={16} />
             </Button>
           </div>
@@ -421,8 +482,20 @@ function Menu() {
           {menu.length === 0 ? (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
               <ShoppingCart size={48} className="mx-auto text-gray-200 mb-4" />
-              <h3 className="text-2xl font-light text-black mb-2">No menu items yet</h3>
-              <p className="text-gray-600 mb-4">Start by creating your first menu category</p>
+              <h3 className="text-2xl font-light text-black mb-2">
+                No{" "}
+                {user?.publicMetadata.type === "wholeseller"
+                  ? "inventory items"
+                  : "menu items"}{" "}
+                yet
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Start by creating your first{" "}
+                {user?.publicMetadata.type === "wholeseller"
+                  ? "inventory"
+                  : "menu"}{" "}
+                category
+              </p>
               <Button
                 onClick={() => openCategoryModal()}
                 className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800"
@@ -432,15 +505,25 @@ function Menu() {
             </div>
           ) : (
             menu.map((category) => (
-              <Card key={category.id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+              <Card
+                key={category.id}
+                className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100"
+              >
                 {/* Category Header */}
                 <CardHeader className="bg-gray-50 px-6 py-4 border-b border-gray-100">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h2 className="text-xl font-semibold text-black">{category.name}</h2>
-                      {category.description && <p className="text-gray-600 mt-1">{category.description}</p>}
+                      <h2 className="text-xl font-semibold text-black">
+                        {category.name}
+                      </h2>
+                      {category.description && (
+                        <p className="text-gray-600 mt-1">
+                          {category.description}
+                        </p>
+                      )}
                       <p className="text-sm text-gray-600 mt-1">
-                        {category.items.length} item{category.items.length !== 1 ? "s" : ""}
+                        {category.items.length} item
+                        {category.items.length !== 1 ? "s" : ""}
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -479,7 +562,9 @@ function Menu() {
                 <CardContent className="p-6">
                   {category.items.length === 0 ? (
                     <div className="text-center py-8">
-                      <p className="text-gray-500">No items in this category yet</p>
+                      <p className="text-gray-500">
+                        No items in this category yet
+                      </p>
                       <Button
                         onClick={() => openItemModal(null, category.id)}
                         variant="link"
@@ -494,7 +579,9 @@ function Menu() {
                         <div
                           key={item.id}
                           className={`border rounded-xl p-4 transition-all duration-200 ${
-                            item.isAvailable ? "border-gray-100 hover:border-gray-200" : "border-red-100 bg-red-50"
+                            item.isAvailable
+                              ? "border-gray-100 hover:border-gray-200"
+                              : "border-red-100 bg-red-50"
                           }`}
                         >
                           {/* Item Image */}
@@ -504,19 +591,23 @@ function Menu() {
                               alt={item.name}
                               className="w-full h-32 object-cover rounded-lg mb-3"
                               onError={(e) => {
-                                e.currentTarget.style.display = "none"
+                                e.currentTarget.style.display = "none";
                               }}
                             />
                           )}
                           {/* Item Details */}
                           <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-medium text-black truncate flex-1 mr-2">{item.name}</h3>
+                            <h3 className="font-medium text-black truncate flex-1 mr-2">
+                              {item.name}
+                            </h3>
                             <span className="text-lg font-semibold text-green-600 whitespace-nowrap">
                               ${Number.parseFloat(item.price).toFixed(2)}
                             </span>
                           </div>
                           {item.description && (
-                            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+                            <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                              {item.description}
+                            </p>
                           )}
                           {item.ingredients && (
                             <p className="text-xs text-gray-500 mb-3 line-clamp-1">
@@ -586,20 +677,32 @@ function Menu() {
         <Dialog open={showSearchModal} onOpenChange={setShowSearchModal}>
           <DialogContent className="sm:max-w-4xl rounded-2xl border-0 shadow-2xl p-6">
             <DialogHeader className="pb-4">
-              <DialogTitle className="text-xl font-medium text-black">Search Results for "{searchQuery}"</DialogTitle>
+              <DialogTitle className="text-xl font-medium text-black">
+                Search Results for "{searchQuery}"
+              </DialogTitle>
             </DialogHeader>
             {searchResults.length === 0 ? (
               <p className="text-gray-500 text-center py-8">No results found</p>
             ) : (
               <div className="space-y-4">
                 {searchResults.map((result, index) => (
-                  <div key={index} className="border border-gray-100 rounded-lg p-4 shadow-sm">
+                  <div
+                    key={index}
+                    className="border border-gray-100 rounded-lg p-4 shadow-sm"
+                  >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h4 className="font-medium text-black">{result.metadata.name}</h4>
+                        <h4 className="font-medium text-black">
+                          {result.metadata.name}
+                        </h4>
                         <p className="text-sm text-gray-600">
-                          {result.metadata.type === "item" ? "Menu Item" : "Category"}
-                          {result.metadata.categoryName && ` • ${result.metadata.categoryName}`}
+                          {result.metadata.type === "item"
+                            ? user?.publicMetadata.type === "wholeseller"
+                              ? "Inventory Item"
+                              : "Menu Item"
+                            : "Category"}
+                          {result.metadata.categoryName &&
+                            ` • ${result.metadata.categoryName}`}
                           {" • "}Similarity: {(result.score * 100).toFixed(1)}%
                         </p>
                       </div>
@@ -610,16 +713,22 @@ function Menu() {
                       )}
                     </div>
                     {result.metadata.description && (
-                      <p className="text-sm text-gray-700 mb-2">{result.metadata.description}</p>
+                      <p className="text-sm text-gray-700 mb-2">
+                        {result.metadata.description}
+                      </p>
                     )}
                     {result.metadata.ingredients && (
                       <p className="text-xs text-gray-500">
-                        <strong>Ingredients:</strong> {result.metadata.ingredients}
+                        <strong>Ingredients:</strong>{" "}
+                        {result.metadata.ingredients}
                       </p>
                     )}
                     {result.metadata.isAvailable !== undefined && (
                       <p className="text-xs text-gray-500 mt-1">
-                        <strong>Status:</strong> {result.metadata.isAvailable ? "Available" : "Unavailable"}
+                        <strong>Status:</strong>{" "}
+                        {result.metadata.isAvailable
+                          ? "Available"
+                          : "Unavailable"}
                       </p>
                     )}
                   </div>
@@ -639,20 +748,31 @@ function Menu() {
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name *
+                </label>
                 <input
                   type="text"
                   value={categoryForm.name}
-                  onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setCategoryForm({ ...categoryForm, name: e.target.value })
+                  }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400"
                   placeholder="e.g., Appetizers"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
                 <textarea
                   value={categoryForm.description}
-                  onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                  onChange={(e) =>
+                    setCategoryForm({
+                      ...categoryForm,
+                      description: e.target.value,
+                    })
+                  }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400 resize-none"
                   rows={3}
                   placeholder="Brief description of this category"
@@ -662,9 +782,9 @@ function Menu() {
             <div className="flex justify-end gap-2 mt-6">
               <Button
                 onClick={() => {
-                  setShowCategoryModal(false)
-                  setEditingCategory(null)
-                  setCategoryForm({ name: "", description: "" })
+                  setShowCategoryModal(false);
+                  setEditingCategory(null);
+                  setCategoryForm({ name: "", description: "" });
                 }}
                 variant="ghost"
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
@@ -674,14 +794,24 @@ function Menu() {
               <Button
                 onClick={editingCategory ? updateCategory : createCategory}
                 className="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50"
-                disabled={!categoryForm.name.trim() || isCreatingCategory || isUpdatingCategory}
+                disabled={
+                  !categoryForm.name.trim() ||
+                  isCreatingCategory ||
+                  isUpdatingCategory
+                }
               >
-                {(isCreatingCategory || isUpdatingCategory) ? (
+                {isCreatingCategory || isUpdatingCategory ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Save size={16} />
                 )}
-                {editingCategory ? (isUpdatingCategory ? "Updating..." : "Update") : (isCreatingCategory ? "Creating..." : "Create")}
+                {editingCategory
+                  ? isUpdatingCategory
+                    ? "Updating..."
+                    : "Update"
+                  : isCreatingCategory
+                  ? "Creating..."
+                  : "Create"}
               </Button>
             </div>
           </DialogContent>
@@ -692,15 +822,29 @@ function Menu() {
           <DialogContent className="sm:max-w-lg rounded-2xl border-0 shadow-2xl p-6 max-h-screen overflow-y-auto">
             <DialogHeader className="pb-4">
               <DialogTitle className="text-xl font-medium text-black">
-                {editingItem ? "Edit Item" : "Create Item"}
+                {editingItem
+                  ? `Edit ${
+                      user?.publicMetadata.type === "wholeseller"
+                        ? "Item"
+                        : "Menu Item"
+                    }`
+                  : `Create ${
+                      user?.publicMetadata.type === "wholeseller"
+                        ? "Item"
+                        : "Menu Item"
+                    }`}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category *
+                </label>
                 <select
                   value={itemForm.categoryId}
-                  onChange={(e) => setItemForm({ ...itemForm, categoryId: e.target.value })}
+                  onChange={(e) =>
+                    setItemForm({ ...itemForm, categoryId: e.target.value })
+                  }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black"
                 >
                   <option value="">Select a category</option>
@@ -712,43 +856,63 @@ function Menu() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name *
+                </label>
                 <input
                   type="text"
                   value={itemForm.name}
-                  onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setItemForm({ ...itemForm, name: e.target.value })
+                  }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400"
                   placeholder="e.g., Caesar Salad"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Price *
+                </label>
                 <input
                   type="number"
                   step="0.01"
                   min="0"
                   value={itemForm.price}
-                  onChange={(e) => setItemForm({ ...itemForm, price: e.target.value })}
+                  onChange={(e) =>
+                    setItemForm({ ...itemForm, price: e.target.value })
+                  }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400"
                   placeholder="12.99"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
                 <textarea
                   value={itemForm.description}
-                  onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
+                  onChange={(e) =>
+                    setItemForm({ ...itemForm, description: e.target.value })
+                  }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400 resize-none"
                   rows={3}
-                  placeholder="Describe this menu item"
+                  placeholder={`Describe this ${
+                    user?.publicMetadata.type === "wholeseller"
+                      ? "inventory item"
+                      : "menu item"
+                  }`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ingredients</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Ingredients
+                </label>
                 <input
                   type="text"
                   value={itemForm.ingredients}
-                  onChange={(e) => setItemForm({ ...itemForm, ingredients: e.target.value })}
+                  onChange={(e) =>
+                    setItemForm({ ...itemForm, ingredients: e.target.value })
+                  }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400"
                   placeholder="Lettuce, Tomato, Cheese, etc."
                 />
@@ -758,10 +922,15 @@ function Menu() {
                   type="checkbox"
                   id="isAvailable"
                   checked={itemForm.isAvailable}
-                  onChange={(e) => setItemForm({ ...itemForm, isAvailable: e.target.checked })}
+                  onChange={(e) =>
+                    setItemForm({ ...itemForm, isAvailable: e.target.checked })
+                  }
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <label htmlFor="isAvailable" className="text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="isAvailable"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Available for order
                 </label>
               </div>
@@ -769,8 +938,8 @@ function Menu() {
             <div className="flex justify-end gap-2 mt-6">
               <Button
                 onClick={() => {
-                  setShowItemModal(false)
-                  setEditingItem(null)
+                  setShowItemModal(false);
+                  setEditingItem(null);
                   setItemForm({
                     name: "",
                     description: "",
@@ -779,7 +948,7 @@ function Menu() {
                     isAvailable: true,
                     ingredients: "",
                     categoryId: "",
-                  })
+                  });
                 }}
                 variant="ghost"
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
@@ -789,21 +958,33 @@ function Menu() {
               <Button
                 onClick={editingItem ? updateItem : createItem}
                 className="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50"
-                disabled={!itemForm.name.trim() || !itemForm.price || !itemForm.categoryId || isCreatingItem || isUpdatingItem}
+                disabled={
+                  !itemForm.name.trim() ||
+                  !itemForm.price ||
+                  !itemForm.categoryId ||
+                  isCreatingItem ||
+                  isUpdatingItem
+                }
               >
-                {(isCreatingItem || isUpdatingItem) ? (
+                {isCreatingItem || isUpdatingItem ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Save size={16} />
                 )}
-                {editingItem ? (isUpdatingItem ? "Updating..." : "Update") : (isCreatingItem ? "Creating..." : "Create")}
+                {editingItem
+                  ? isUpdatingItem
+                    ? "Updating..."
+                    : "Update"
+                  : isCreatingItem
+                  ? "Creating..."
+                  : "Create"}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
     </div>
-  )
+  );
 }
 
-export default Menu
+export default Menu;

@@ -25,6 +25,7 @@ import { useClerk, useUser } from "@clerk/clerk-react";
 const mainNavItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/orders", label: "Orders", icon: ClipboardList },
+  { path: "/menu", label: "Menu", icon: ClipboardList },
   { path: "/cuisine", label: "Cuisine", icon: ChefHat },
   { path: "/inventory", label: "Inventory", icon: Box },
 ];
@@ -60,13 +61,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { signOut } = useClerk();
   const { user } = useUser();
 
-  // Filter out cuisine for wholesellers
+  // Filter navigation items based on user type
   const filteredNavItems = mainNavItems.filter((item) => {
-    if (
-      item.path === "/cuisine" &&
-      user?.publicMetadata.type === "wholeseller"
-    ) {
-      return false;
+    if (user?.publicMetadata.type === "wholeseller") {
+      // For wholesellers: exclude cuisine and menu
+      if (item.path === "/cuisine" || item.path === "/menu") {
+        return false;
+      }
+    } else {
+      // For non-wholesellers: exclude inventory
+      if (item.path === "/inventory") {
+        return false;
+      }
     }
     return true;
   });
