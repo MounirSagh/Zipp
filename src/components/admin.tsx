@@ -79,7 +79,7 @@ function Admin() {
   };
 
   const handlePending = async (orderId: number, phone: string) => {
-    await updateOrderStatus(orderId, "pending");
+    await updateOrderStatus(orderId, "Processing");
     await sendSMS(
       phone,
       `We’ve received your order #${orderId}.
