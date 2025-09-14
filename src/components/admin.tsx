@@ -78,6 +78,18 @@ function Admin() {
     }
   };
 
+  const handlePending = async (orderId: number, phone: string) => {
+    await updateOrderStatus(orderId, "pending");
+    await sendSMS(
+      phone,
+      `We’ve received your order #${orderId}.
+        If this is a pickup, please reply PICKUP.
+        If this is a delivery, please share your location.
+      `
+    );
+    fetchOrders();
+  };
+
   const handleConfirm = async (orderId: number, phone: string) => {
     await updateOrderStatus(orderId, "confirmed");
     await sendSMS(phone, `Your order #${orderId} has been confirmed! ✅`);
@@ -321,6 +333,21 @@ function Admin() {
                             )}
                             {/* Actions */}
                             <div className="flex space-x-3 pt-4">
+                              <Button
+                                onClick={() =>
+                                  handlePending(order.id, order.phoneNumber)
+                                }
+                                disabled={
+                                  order.status.toLowerCase() === "processing"
+                                }
+                                className={`bg-blue-600 text-white hover:bg-blue-700 rounded-lg px-6 py-2 font-medium transition-colors ${
+                                  order.status.toLowerCase() === "processing"
+                                    ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400"
+                                    : ""
+                                }`}
+                              >
+                                Process
+                              </Button>
                               <Button
                                 onClick={() =>
                                   handleConfirm(order.id, order.phoneNumber)
