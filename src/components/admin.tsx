@@ -91,7 +91,7 @@ function Admin() {
   };
 
   const handleConfirm = async (orderId: number, phone: string) => {
-    await updateOrderStatus(orderId, "confirmed");
+    await updateOrderStatus(orderId, "Confirmed");
     await sendSMS(phone, `Your order #${orderId} has been confirmed! ✅`);
     fetchOrders();
   };
@@ -103,7 +103,7 @@ function Admin() {
   // }
 
   const handleReject = async (orderId: number, phone: string) => {
-    await updateOrderStatus(orderId, "rejected");
+    await updateOrderStatus(orderId, "Rejected");
     await sendSMS(
       phone,
       `Unfortunately, your order has been rejected. ${
@@ -210,6 +210,9 @@ function Admin() {
                   <TableHead className="font-semibold text-gray-600 py-4">
                     Status
                   </TableHead>
+                  <TableHead className="font-semibold text-gray-600 py-4">
+                    Location
+                  </TableHead>
                   <TableHead className="font-semibold text-gray-600 py-4"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -259,6 +262,11 @@ function Admin() {
                         >
                           {order.status}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <span className="text-gray-800 font-semibold">
+                          {order.location} 
+                        </span>
                       </TableCell>
                       <TableCell className="py-4 text-right">
                         <Button
@@ -340,7 +348,7 @@ function Admin() {
                                 disabled={
                                   order.status.toLowerCase() === "processing"
                                 }
-                                className={`bg-blue-600 text-white hover:bg-blue-700 rounded-lg px-6 py-2 font-medium transition-colors ${
+                                className={`bg-yellow-600 text-white hover:bg-yellow-700 rounded-lg px-6 py-2 font-medium transition-colors ${
                                   order.status.toLowerCase() === "processing"
                                     ? "opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400"
                                     : ""
