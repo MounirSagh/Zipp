@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Admin from './pages/admin';
 import CuisinePanel from './pages/cuisine';
 import SignIn from './pages/SignIn'
