@@ -201,6 +201,9 @@ function Admin() {
                   <TableHead className="font-semibold text-gray-600 py-4">
                     Location
                   </TableHead>
+                  <TableHead className="font-semibold text-gray-600 py-4">
+                    Table
+                  </TableHead>
                   <TableHead className="font-semibold text-gray-600 py-4"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -254,6 +257,11 @@ function Admin() {
                       <TableCell className="py-4">
                         <span className="text-gray-800 font-semibold">
                           {order.location} 
+                        </span>
+                      </TableCell>
+                        <TableCell className="py-4">
+                        <span className="text-gray-800 font-semibold">
+                          {order.table} 
                         </span>
                       </TableCell>
                       <TableCell className="py-4 text-right">

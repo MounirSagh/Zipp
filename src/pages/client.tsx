@@ -40,6 +40,7 @@ type CustomerInfo = {
   lastName: string;
   specialInstructions: string;
   location: string;
+  table: string;
 };
 
 type ApiResp<T> = { success: boolean; data: T; error?: string };
@@ -57,7 +58,8 @@ export default function RestaurantPage() {
     firstName: "",
     lastName: "",
     specialInstructions: "",
-    location: "",
+    location: "Dine-in",
+    table: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -168,7 +170,8 @@ export default function RestaurantPage() {
           firstName: "",
           lastName: "",
           specialInstructions: "",
-          location: "",
+          location: "Dine-in",
+          table: ""
         });
         setIsCheckoutOpen(false);
       } else {
@@ -281,7 +284,7 @@ export default function RestaurantPage() {
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center text-lg font-bold">
                       <span>Total:</span>
-                      <span>{getTotalPrice().toFixed(2)} MAD</span>
+                      <span>{getTotalPrice().toFixed(2)} $</span>
                     </div>
                   </div>
                   
@@ -396,10 +399,10 @@ export default function RestaurantPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Delivery Location</label>
+              <label className="block text-sm font-medium mb-1">Table</label>
               <Input
-                value={customerInfo.location}
-                onChange={(e) => setCustomerInfo(prev => ({ ...prev, location: e.target.value }))}
+                value={customerInfo.table}
+                onChange={(e) => setCustomerInfo(prev => ({ ...prev, table: e.target.value }))}
                 placeholder="Enter delivery address"
               />
             </div>
