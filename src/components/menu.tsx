@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUser } from "@clerk/clerk-react";
+import ImageUpload from "./ImageUpload";
 
 function Menu() {
   const [menu, setMenu] = useState<any[]>([]);
@@ -585,16 +586,45 @@ function Menu() {
                           }`}
                         >
                           {/* Item Image */}
-                          {item.imageUrl && (
-                            <img
-                              src={item.imageUrl || "/placeholder.svg"}
-                              alt={item.name}
-                              className="w-full h-32 object-cover rounded-lg mb-3"
-                              onError={(e) => {
-                                e.currentTarget.style.display = "none";
-                              }}
-                            />
-                          )}
+                          <div className="w-full h-32 bg-gray-100 rounded-lg mb-3 overflow-hidden flex items-center justify-center">
+                            {item.imageUrl ? (
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // On error, show placeholder
+                                  const target = e.currentTarget;
+                                  target.style.display = "none";
+                                  const placeholder =
+                                    target.nextElementSibling as HTMLElement;
+                                  if (placeholder) {
+                                    placeholder.style.display = "flex";
+                                  }
+                                }}
+                              />
+                            ) : null}
+                            <div
+                              className={`w-full h-full flex items-center justify-center text-gray-400 ${
+                                item.imageUrl ? "hidden" : "flex"
+                              }`}
+                            >
+                              <div className="text-center">
+                                <svg
+                                  className="w-8 h-8 mx-auto mb-1"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                <p className="text-xs">No image</p>
+                              </div>
+                            </div>
+                          </div>
                           {/* Item Details */}
                           <div className="flex justify-between items-start mb-2">
                             <h3 className="font-medium text-black truncate flex-1 mr-2">
@@ -885,6 +915,17 @@ function Menu() {
                   placeholder="12.99"
                 />
               </div>
+
+              {/* Image Upload Component */}
+              <ImageUpload
+                currentImageUrl={itemForm.imageUrl}
+                onImageUpload={(imageUrl) =>
+                  setItemForm({ ...itemForm, imageUrl })
+                }
+                onImageRemove={() => setItemForm({ ...itemForm, imageUrl: "" })}
+                disabled={isCreatingItem || isUpdatingItem}
+              />
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
