@@ -537,7 +537,7 @@ export default function RestaurantPage() {
                       table: e.target.value,
                     }))
                   }
-                  placeholder="Table number or delivery address"
+                  placeholder="Table number"
                   className="bg-zinc-900 border-zinc-700 text-white placeholder-gray-500 focus:border-orange-400 focus:ring-orange-400/20 h-12 text-base"
                 />
               </div>
