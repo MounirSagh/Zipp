@@ -171,6 +171,7 @@ export default function RestaurantPage() {
             totalAmount: getTotalPrice(),
             specialInstructions: customerInfo.specialInstructions,
             location: customerInfo.location,
+            table: customerInfo.table,
           }),
         }
       );
@@ -571,8 +572,7 @@ export default function RestaurantPage() {
                         {item.quantity}x {item.name}
                       </span>
                       <span className="text-orange-400 font-medium ml-2">
-                        {(parseFloat(item.price) * item.quantity).toFixed(2)}{" "}
-                        $
+                        {(parseFloat(item.price) * item.quantity).toFixed(2)} $
                       </span>
                     </div>
                   ))}
