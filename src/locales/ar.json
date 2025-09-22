@@ -1,0 +1,53 @@
+{
+  "loading": "جاري تحميل القائمة...",
+  "error": {
+    "tryAgain": "حاول مرة أخرى",
+    "noMenu": "لم يتم العثور على قائمة."
+  },
+  "cart": {
+    "title": "طلبك",
+    "empty": "سلة التسوق فارغة",
+    "total": "الإجمالي:",
+    "checkout": "المتابعة للدفع",
+    "each": "لكل واحد"
+  },
+  "orderSuccess": {
+    "title": "تم إرسال الطلب!",
+    "message": "شكراً لك على طلبك. سيتواصل معك المطعم قريباً لتأكيد الطلب وتفاصيل التحضير.",
+    "orderAgain": "اطلب مرة أخرى"
+  },
+  "menu": {
+    "addToCart": "أضف للسلة",
+    "notAvailable": "غير متوفر",
+    "ingredients": "المكونات:",
+    "details": "تفاصيل العنصر",
+    "close": "إغلاق",
+    "quantity": "الكمية"
+  },
+  "checkout": {
+    "title": "الدفع",
+    "phoneNumber": "رقم الهاتف",
+    "phoneRequired": "رقم الهاتف *",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "table": "الطاولة",
+    "tableNumber": "رقم الطاولة",
+    "specialInstructions": "تعليمات خاصة",
+    "specialInstructionsPlaceholder": "أي طلبات خاصة أو متطلبات غذائية...",
+    "submitOrder": "إرسال الطلب",
+    "submitting": "جاري الإرسال...",
+    "validation": {
+      "fillPhone": "يرجى ملء رقم هاتفك وإضافة عناصر إلى سلة التسوق"
+    }
+  },
+  "placeholders": {
+    "phoneNumber": "أدخل رقم هاتفك",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة"
+  },
+  "languages": {
+    "english": "English",
+    "french": "Français",
+    "arabic": "العربية"
+  }
+}

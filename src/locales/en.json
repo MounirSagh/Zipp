@@ -1,0 +1,53 @@
+{
+  "loading": "Loading menu...",
+  "error": {
+    "tryAgain": "Try Again",
+    "noMenu": "No menu found."
+  },
+  "cart": {
+    "title": "Your Order",
+    "empty": "Your cart is empty",
+    "total": "Total:",
+    "checkout": "Proceed to Checkout",
+    "each": "each"
+  },
+  "orderSuccess": {
+    "title": "Order Submitted!",
+    "message": "Thank you for your order. The restaurant will contact you shortly with confirmation and preparation details.",
+    "orderAgain": "Order Again"
+  },
+  "menu": {
+    "addToCart": "Add to Cart",
+    "notAvailable": "Not Available",
+    "ingredients": "Ingredients:",
+    "details": "Item Details",
+    "close": "Close",
+    "quantity": "Quantity"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "phoneNumber": "Phone Number",
+    "phoneRequired": "Phone Number *",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "table": "Table",
+    "tableNumber": "Table number",
+    "specialInstructions": "Special Instructions",
+    "specialInstructionsPlaceholder": "Any special requests or dietary requirements...",
+    "submitOrder": "Submit Order",
+    "submitting": "Submitting...",
+    "validation": {
+      "fillPhone": "Please fill in your phone number and add items to your cart"
+    }
+  },
+  "placeholders": {
+    "phoneNumber": "Enter your phone number",
+    "firstName": "First name",
+    "lastName": "Last name"
+  },
+  "languages": {
+    "english": "English",
+    "french": "Français",
+    "arabic": "العربية"
+  }
+}

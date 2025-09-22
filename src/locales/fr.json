@@ -1,0 +1,53 @@
+{
+  "loading": "Chargement du menu...",
+  "error": {
+    "tryAgain": "Réessayer",
+    "noMenu": "Aucun menu trouvé."
+  },
+  "cart": {
+    "title": "Votre Commande",
+    "empty": "Votre panier est vide",
+    "total": "Total :",
+    "checkout": "Procéder au Paiement",
+    "each": "chacun"
+  },
+  "orderSuccess": {
+    "title": "Commande Soumise !",
+    "message": "Merci pour votre commande. Le restaurant vous contactera bientôt avec la confirmation et les détails de préparation.",
+    "orderAgain": "Commander Encore"
+  },
+  "menu": {
+    "addToCart": "Ajouter au Panier",
+    "notAvailable": "Non Disponible",
+    "ingredients": "Ingrédients :",
+    "details": "Détails de l'Article",
+    "close": "Fermer",
+    "quantity": "Quantité"
+  },
+  "checkout": {
+    "title": "Paiement",
+    "phoneNumber": "Numéro de Téléphone",
+    "phoneRequired": "Numéro de Téléphone *",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "table": "Table",
+    "tableNumber": "Numéro de table",
+    "specialInstructions": "Instructions Spéciales",
+    "specialInstructionsPlaceholder": "Des demandes spéciales ou des exigences alimentaires...",
+    "submitOrder": "Soumettre la Commande",
+    "submitting": "Soumission...",
+    "validation": {
+      "fillPhone": "Veuillez remplir votre numéro de téléphone et ajouter des articles à votre panier"
+    }
+  },
+  "placeholders": {
+    "phoneNumber": "Entrez votre numéro de téléphone",
+    "firstName": "Prénom",
+    "lastName": "Nom"
+  },
+  "languages": {
+    "english": "English",
+    "french": "Français",
+    "arabic": "العربية"
+  }
+}

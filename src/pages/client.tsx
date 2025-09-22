@@ -1,6 +1,7 @@
 // src/pages/RestaurantPage.tsx
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCartIcon } from "lucide-react";
+import { ShoppingCartIcon, Trash } from "lucide-react";
+import LanguageSelector from "@/components/LanguageSelector";
 
 function fromCode(code: string) {
   const b64 = code.replace(/-/g, "+").replace(/_/g, "/");
@@ -54,12 +56,15 @@ type ApiResp<T> = { success: boolean; data: T; error?: string };
 
 export default function RestaurantPage() {
   const { code = "" } = useParams();
+  const { t } = useTranslation();
   const [menu, setMenu] = useState<MenuCategory[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [itemQuantity, setItemQuantity] = useState(1);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     phoneNumber: "",
     firstName: "",
@@ -112,6 +117,31 @@ export default function RestaurantPage() {
     });
   };
 
+  const addToCartWithQuantity = (item: MenuItem, quantity: number) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+      if (existingItem) {
+        return prevCart.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + quantity }
+            : cartItem
+        );
+      } else {
+        return [...prevCart, { ...item, quantity }];
+      }
+    });
+  };
+
+  const openItemModal = (item: MenuItem) => {
+    setSelectedItem(item);
+    setItemQuantity(1);
+  };
+
+  const closeItemModal = () => {
+    setSelectedItem(null);
+    setItemQuantity(1);
+  };
+
   const removeFromCart = (itemId: number) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== itemId));
   };
@@ -141,7 +171,7 @@ export default function RestaurantPage() {
 
   const handleSubmitOrder = async () => {
     if (!customerInfo.phoneNumber || cart.length === 0) {
-      alert("Please fill in your phone number and add items to your cart");
+      alert(t("checkout.validation.fillPhone"));
       return;
     }
 
@@ -203,17 +233,17 @@ export default function RestaurantPage() {
   /** --- Render --- */
   if (loading)
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-lg sm:text-xl text-orange-400 animate-pulse flex items-center gap-3 font-medium">
-          <div className="w-6 h-6 border-2 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
-          Loading menu...
+      <div className="min-h-screen bg-neutral-900 flex items-center justify-center">
+        <div className="text-lg sm:text-xl text-white animate-pulse flex items-center gap-3 font-medium">
+          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          {t("loading")}
         </div>
       </div>
     );
 
   if (error)
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-900 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">⚠️</div>
           <div className="text-red-400 text-lg sm:text-xl font-semibold leading-relaxed">
@@ -221,9 +251,9 @@ export default function RestaurantPage() {
           </div>
           <Button
             onClick={() => window.location.reload()}
-            className="mt-4 bg-orange-500 hover:bg-orange-600 text-black font-semibold tracking-wide"
+            className="mt-4 bg-white text-neutral-900 hover:bg-neutral-100 font-semibold"
           >
-            Try Again
+            {t("error.tryAgain")}
           </Button>
         </div>
       </div>
@@ -231,11 +261,11 @@ export default function RestaurantPage() {
 
   if (!menu || menu.length === 0)
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-900 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">📋</div>
-          <div className="text-gray-400 text-lg sm:text-xl font-medium">
-            No menu found.
+          <div className="text-neutral-400 text-lg sm:text-xl font-medium">
+            {t("error.noMenu")}
           </div>
         </div>
       </div>
@@ -243,21 +273,20 @@ export default function RestaurantPage() {
 
   if (orderSuccess) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="bg-black border border-orange-500/30 p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-md w-full">
-          <div className="text-6xl mb-6 animate-bounce">✅</div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-orange-400 mb-4 leading-tight tracking-wide">
-            Order Submitted!
+      <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
+        <div className="bg-neutral-800 border border-yellow-300/20 p-6 sm:p-8 rounded-2xl shadow-2xl text-center max-w-md w-full">
+          <div className="text-6xl mb-6">✅</div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            {t("orderSuccess.title")}
           </h1>
-          <p className="text-gray-400 mb-6 leading-relaxed text-sm sm:text-base">
-            Thank you for your order. The restaurant will contact you shortly
-            with confirmation and preparation details.
+          <p className="text-neutral-400 mb-6 text-sm sm:text-base">
+            {t("orderSuccess.message")}
           </p>
           <Button
             onClick={() => setOrderSuccess(false)}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-black font-bold py-3 rounded-lg transition-all duration-200 transform hover:scale-105 tracking-wide"
+            className="w-full bg-white text-neutral-900 hover:bg-neutral-100 font-bold py-3 rounded-lg transition-all duration-200"
           >
-            Order Again
+            {t("orderSuccess.orderAgain")}
           </Button>
         </div>
       </div>
@@ -265,34 +294,38 @@ export default function RestaurantPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-neutral-900 text-white">
       {/* Header */}
-      <div className="bg-black border-b border-orange-500/30 sticky top-0 z-40 shadow-lg">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            {/* <h1 className="text-xl sm:text-3xl font-bold text-orange-400 tracking-tight leading-none">
-              Zipp
-            </h1> */}
+      <div className="backdrop-blur-lg border-b border-neutral-800 sticky top-0 z-40 shadow-xl">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-400 bg-clip-text text-transparent tracking-tight">
+                Zipp
+              </h1>
+            </div>
           </div>
+        <div className="flex items-center gap-4">
+          <LanguageSelector />
           <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
             <DialogTrigger asChild>
               <Button
                 variant="outline"
-                className="relative bg-black border-orange-500/60 text-orange-400 hover:bg-orange-500/20 hover:border-orange-400 transition-all duration-200 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold text-sm sm:text-base min-h-[44px] shadow-lg hover:shadow-orange-500/20"
+                className="relative bg-neutral-800 border-yellow-300/20 text-white hover:bg-neutral-700 transition-all duration-200 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm min-h-[40px] shadow-lg"
               >
-                <ShoppingCartIcon />
-                <span className="hidden sm:inline ml-1">Cart</span>
+                <ShoppingCartIcon className="w-5 h-5" />
+                <span className="hidden sm:inline ml-2">{t("cart.title")}</span>
                 {getTotalItems() > 0 && (
-                  <Badge className="absolute -top-2 -right-2 min-w-[20px] h-5 text-xs bg-orange-500 text-black border-0 animate-pulse font-bold shadow-lg">
+                  <Badge className="absolute -top-1 -right-1 min-w-[18px] h-4 text-xs bg-red-500 text-white border-0 font-bold">
                     {getTotalItems()}
                   </Badge>
                 )}
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[95vw] max-w-md max-h-[85vh] bg-black border-orange-500/40 text-white rounded-2xl shadow-2xl flex flex-col">
-              <DialogHeader className="pb-4 border-b border-zinc-800 flex-shrink-0">
-                <DialogTitle className="text-xl sm:text-2xl text-orange-400 font-black tracking-tight">
-                  Your Order
+            <DialogContent className="w-[95vw] max-w-sm bg-neutral-900 border-yellow-500/30 text-white rounded-2xl shadow-2xl backdrop-blur-lg flex flex-col">
+              <DialogHeader className="pb-4 border-b border-yellow-500/20 flex-shrink-0">
+                <DialogTitle className="text-xl sm:text-2xl text-white font-bold">
+                  {t("cart.title")}
                 </DialogTitle>
               </DialogHeader>
 
@@ -300,41 +333,44 @@ export default function RestaurantPage() {
                 {cart.length === 0 ? (
                   <div className="text-center py-8">
                     <div className="text-4xl mb-3 opacity-50">🛒</div>
-                    <p className="text-gray-400 text-sm">Your cart is empty</p>
+                    <p className="text-neutral-400 text-sm">
+                      {t("cart.empty")}
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3 p-1">
                     {cart.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between p-3 bg-zinc-900 rounded-lg border border-zinc-800 hover:border-orange-500/30 transition-colors"
+                        className="flex items-center justify-between p-3 border-b border-yellow-300/20 rounded-lg"
                       >
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-orange-400 text-sm truncate">
+                          <h4 className="font-semibold text-white text-sm truncate">
                             {item.name}
                           </h4>
-                          <p className="text-xs text-gray-400">
-                            {parseFloat(item.price).toFixed(2)} $ each
+                          <p className="text-xs text-neutral-400">
+                            ${parseFloat(item.price).toFixed(2)}{" "}
+                            {t("cart.each")}
                           </p>
                         </div>
                         <div className="flex items-center gap-1 ml-2">
                           <Button
                             size="sm"
                             variant="outline"
-                            className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 w-8 h-8 min-h-[32px] text-sm"
+                            className="bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 w-8 h-8 min-h-[32px] text-sm"
                             onClick={() =>
                               updateQuantity(item.id, item.quantity - 1)
                             }
                           >
                             -
                           </Button>
-                          <span className="w-8 text-center font-medium text-orange-400 text-sm">
+                          <span className="w-8 text-center font-medium text-white text-sm">
                             {item.quantity}
                           </span>
                           <Button
                             size="sm"
                             variant="outline"
-                            className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 w-8 h-8 min-h-[32px] text-sm"
+                            className="bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 w-8 h-8 min-h-[32px] text-sm"
                             onClick={() =>
                               updateQuantity(item.id, item.quantity + 1)
                             }
@@ -347,7 +383,7 @@ export default function RestaurantPage() {
                             className="bg-red-600 hover:bg-red-700 w-8 h-8 min-h-[32px] text-sm ml-1"
                             onClick={() => removeFromCart(item.id)}
                           >
-                            ×
+                            <Trash />
                           </Button>
                         </div>
                       </div>
@@ -357,27 +393,28 @@ export default function RestaurantPage() {
               </div>
 
               {cart.length > 0 && (
-                <div className="border-t border-zinc-800 pt-3 mt-3 flex-shrink-0">
+                <div className="border-t border-neutral-700 pt-3 mt-3 flex-shrink-0">
                   <div className="flex justify-between items-center text-lg font-bold mb-3">
-                    <span className="text-white">Total:</span>
-                    <span className="text-orange-400">
-                      {getTotalPrice().toFixed(2)} $
+                    <span className="text-white">{t("cart.total")}</span>
+                    <span className="text-white">
+                      ${getTotalPrice().toFixed(2)}
                     </span>
                   </div>
 
                   <Button
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-black font-black py-4 rounded-xl transition-all duration-200 transform hover:scale-105 min-h-[48px] tracking-wide shadow-lg hover:shadow-orange-500/30"
+                    className="w-full bg-white text-neutral-900 hover:bg-neutral-100 font-bold py-4 rounded-xl transition-all duration-200 min-h-[48px]"
                     onClick={() => {
                       setIsCartOpen(false);
                       setIsCheckoutOpen(true);
                     }}
                   >
-                    Proceed to Checkout
+                    {t("cart.checkout")}
                   </Button>
                 </div>
               )}
             </DialogContent>
           </Dialog>
+        </div>
         </div>
       </div>
 
@@ -385,73 +422,79 @@ export default function RestaurantPage() {
       <div className="container mx-auto px-4 py-6">
         {menu &&
           menu.map((category) => (
-            <section key={category.id} className="mb-12">
-              <div className="mb-6 text-center">
-                <h2 className="text-2xl sm:text-4xl font-black text-orange-400 mb-2 tracking-tight leading-tight">
+            <section key={category.id} className="mb-8">
+              <div className="flex text-center items-center justify-center bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg shadow-2xl shadow-yellow-300/80">
+                <h2 className="text-xl sm:text-2xl font-bold text-yellow-300 mb-2">
                   {category.name}
                 </h2>
                 {category.description && (
-                  <p className="text-gray-400 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
+                  <p className="text-neutral-400 text-sm sm:text-base mb-4">
                     {category.description}
                   </p>
                 )}
-                <div className="w-16 sm:w-24 h-1 bg-orange-500 mx-auto mt-3 rounded-full"></div>
               </div>
 
-              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="space-y-4">
                 {category.items.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-zinc-900 rounded-2xl border border-zinc-800 hover:border-orange-500/60 p-4 sm:p-6 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10 shadow-lg group backdrop-blur-sm"
+                    onClick={() => openItemModal(item)}
+                    className="bg-neutral-900 border border-yellow-300/20 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-neutral-750 transition-all duration-200 touch-manipulation active:scale-98"
                   >
-                    {item.imageUrl && (
-                      <div className="overflow-hidden rounded-lg mb-3">
+                    {/* Item Image */}
+                    <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
+                      {item.imageUrl ? (
                         <img
                           src={item.imageUrl}
                           alt={item.name}
-                          className="w-full h-36 sm:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                          className="w-full h-full object-cover"
                         />
-                      </div>
-                    )}
-
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-black text-lg sm:text-xl text-orange-400 group-hover:text-orange-300 transition-colors leading-tight tracking-tight">
-                          {item.name}
-                        </h3>
-                        <div className="bg-orange-500 text-black font-black px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap tracking-wide">
-                          {parseFloat(item.price).toFixed(2)} $
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-neutral-600 to-neutral-700 flex items-center justify-center">
+                          <span className="text-2xl">🍽️</span>
                         </div>
-                      </div>
+                      )}
+                    </div>
 
+                    {/* Item Details */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-white text-base sm:text-lg mb-1 truncate">
+                        {item.name}
+                      </h3>
                       {item.description && (
-                        <p className="text-gray-400 text-xs sm:text-sm leading-relaxed font-light tracking-wide">
+                        <p className="text-neutral-400 text-sm line-clamp-2 mb-2">
                           {item.description}
                         </p>
                       )}
-
-                      {item.ingredients && (
-                        <p className="text-gray-500 text-xs bg-zinc-800 p-2 rounded-md font-light leading-relaxed">
-                          <span className="text-orange-400 font-semibold tracking-wide">
-                            Ingredients:
-                          </span>{" "}
-                          {item.ingredients}
-                        </p>
-                      )}
-
-                      <Button
-                        className={`w-full mt-3 py-3 sm:py-4 rounded-xl font-black transition-all duration-200 min-h-[48px] text-sm sm:text-base tracking-wide shadow-lg ${
-                          item.isAvailable
-                            ? "bg-orange-500 hover:bg-orange-600 text-black transform hover:scale-105 active:scale-95 hover:shadow-orange-500/30"
-                            : "bg-zinc-700 text-gray-400 cursor-not-allowed"
-                        }`}
-                        onClick={() => addToCart(item)}
-                        disabled={!item.isAvailable}
-                      >
-                        {item.isAvailable
-                          ? "🛒 Add to Cart"
-                          : "❌ Not Available"}
-                      </Button>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white font-bold text-lg">
+                          ${parseFloat(item.price).toFixed(2)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {!item.isAvailable && (
+                            <span className="text-red-400 text-xs font-medium">
+                              {t("menu.notAvailable")}
+                            </span>
+                          )}
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (item.isAvailable) {
+                                addToCart(item);
+                              }
+                            }}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                              item.isAvailable
+                                ? "bg-neutral-600 hover:bg-neutral-500 cursor-pointer active:scale-95"
+                                : "bg-neutral-700 cursor-not-allowed opacity-50"
+                            }`}
+                          >
+                            <span className="text-white text-lg font-bold">
+                              +
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -460,20 +503,132 @@ export default function RestaurantPage() {
           ))}
       </div>
 
+      {/* Item Detail Modal */}
+      <Dialog open={selectedItem !== null} onOpenChange={closeItemModal}>
+        <DialogContent className="w-[95vw] max-w-lg bg-neutral-800 border-yellow-300/20 text-white rounded-2xl shadow-2xl">
+          {selectedItem && (
+            <>
+              <DialogHeader className="pb-4 border-b border-yellow-300/20">
+                <DialogTitle className="text-xl font-bold text-white">
+                  {t("menu.details")}
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                {/* Item Image */}
+                {selectedItem.imageUrl && (
+                  <div className="w-full h-48 rounded-xl overflow-hidden">
+                    <img
+                      src={selectedItem.imageUrl}
+                      alt={selectedItem.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                {/* Item Info */}
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">
+                    {selectedItem.name}
+                  </h3>
+                  {selectedItem.description && (
+                    <p className="text-neutral-300 text-sm mb-3">
+                      {selectedItem.description}
+                    </p>
+                  )}
+                  {selectedItem.ingredients && (
+                    <div className="mb-3">
+                      <p className="text-neutral-400 text-xs">
+                        <span className="font-semibold text-white">
+                          {t("menu.ingredients")}
+                        </span>{" "}
+                        {selectedItem.ingredients}
+                      </p>
+                    </div>
+                  )}
+                  <div className="text-2xl font-bold text-white">
+                    ${parseFloat(selectedItem.price).toFixed(2)}
+                  </div>
+                </div>
+
+                {/* Quantity Selector */}
+                <div className="flex items-center gap-4">
+                  <span className="text-white font-medium">
+                    {t("menu.quantity")}:
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600 w-8 h-8"
+                      onClick={() =>
+                        setItemQuantity(Math.max(1, itemQuantity - 1))
+                      }
+                    >
+                      -
+                    </Button>
+                    <span className="w-8 text-center font-medium text-white">
+                      {itemQuantity}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600 w-8 h-8"
+                      onClick={() => setItemQuantity(itemQuantity + 1)}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Add to Cart Button */}
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1 bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600"
+                    onClick={closeItemModal}
+                  >
+                    {t("menu.close")}
+                  </Button>
+                  <Button
+                    className={`flex-1 ${
+                      selectedItem.isAvailable
+                        ? "bg-white text-neutral-900 hover:bg-neutral-100"
+                        : "bg-neutral-600 text-neutral-400 cursor-not-allowed"
+                    } font-semibold`}
+                    onClick={() => {
+                      if (selectedItem.isAvailable) {
+                        addToCartWithQuantity(selectedItem, itemQuantity);
+                        closeItemModal();
+                      }
+                    }}
+                    disabled={!selectedItem.isAvailable}
+                  >
+                    {selectedItem.isAvailable
+                      ? t("menu.addToCart")
+                      : t("menu.notAvailable")}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Checkout Dialog */}
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
-        <DialogContent className="w-[95vw] max-w-md max-h-[90vh] bg-black border-orange-500/40 text-white rounded-2xl shadow-2xl flex flex-col">
-          <DialogHeader className="pb-4 border-b border-zinc-800 flex-shrink-0">
-            <DialogTitle className="text-xl sm:text-2xl text-orange-400 mb-2 font-black tracking-tight">
-              Checkout
+        <DialogContent className="w-[95vw] max-w-md max-h-[90vh] bg-neutral-800 border-yellow-300/20 text-white rounded-2xl shadow-2xl flex flex-col">
+          <DialogHeader className="pb-4 border-b border-yellow-300/20 flex-shrink-0">
+            <DialogTitle className="text-xl sm:text-2xl text-white font-bold">
+              {t("checkout.title")}
             </DialogTitle>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto min-h-0">
             <div className="space-y-4 p-1">
               <div>
-                <label className="block text-sm font-semibold mb-2 text-orange-400">
-                  Phone Number *
+                <label className="block text-sm font-semibold mb-2 text-white">
+                  {t("checkout.phoneRequired")}
                 </label>
                 <Input
                   type="tel"
@@ -484,16 +639,16 @@ export default function RestaurantPage() {
                       phoneNumber: e.target.value,
                     }))
                   }
-                  placeholder="Enter your phone number"
-                  className="bg-zinc-900 border-zinc-700 text-white placeholder-gray-500 focus:border-orange-400 focus:ring-orange-400/20 h-12 text-base"
+                  placeholder={t("placeholders.phoneNumber")}
+                  className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 focus:border-neutral-500 h-12 text-base"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-semibold mb-2 text-orange-400">
-                    First Name
+                  <label className="block text-sm font-semibold mb-2 text-white">
+                    {t("checkout.firstName")}
                   </label>
                   <Input
                     value={customerInfo.firstName}
@@ -503,13 +658,13 @@ export default function RestaurantPage() {
                         firstName: e.target.value,
                       }))
                     }
-                    placeholder="First name"
-                    className="bg-zinc-900 border-zinc-700 text-white placeholder-gray-500 focus:border-orange-400 focus:ring-orange-400/20 h-12 text-base"
+                    placeholder={t("placeholders.firstName")}
+                    className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 focus:border-neutral-500 h-12 text-base"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2 text-orange-400">
-                    Last Name
+                  <label className="block text-sm font-semibold mb-2 text-white">
+                    {t("checkout.lastName")}
                   </label>
                   <Input
                     value={customerInfo.lastName}
@@ -519,15 +674,15 @@ export default function RestaurantPage() {
                         lastName: e.target.value,
                       }))
                     }
-                    placeholder="Last name"
-                    className="bg-zinc-900 border-zinc-700 text-white placeholder-gray-500 focus:border-orange-400 focus:ring-orange-400/20 h-12 text-base"
+                    placeholder={t("placeholders.lastName")}
+                    className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 focus:border-neutral-500 h-12 text-base"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2 text-orange-400">
-                  Table
+                <label className="block text-sm font-semibold mb-2 text-white">
+                  {t("checkout.table")}
                 </label>
                 <Input
                   value={customerInfo.table}
@@ -537,17 +692,17 @@ export default function RestaurantPage() {
                       table: e.target.value,
                     }))
                   }
-                  placeholder="Table number"
-                  className="bg-zinc-900 border-zinc-700 text-white placeholder-gray-500 focus:border-orange-400 focus:ring-orange-400/20 h-12 text-base"
+                  placeholder={t("checkout.tableNumber")}
+                  className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 focus:border-neutral-500 h-12 text-base"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2 text-orange-400">
-                  Special Instructions
+                <label className="block text-sm font-semibold mb-2 text-white">
+                  {t("checkout.specialInstructions")}
                 </label>
                 <textarea
-                  className="w-full p-3 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:border-orange-400 focus:ring-orange-400/20 focus:outline-none resize-none text-base min-h-[80px]"
+                  className="w-full p-3 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:border-neutral-500 focus:outline-none resize-none text-base min-h-[80px]"
                   rows={3}
                   value={customerInfo.specialInstructions}
                   onChange={(e) =>
@@ -556,29 +711,29 @@ export default function RestaurantPage() {
                       specialInstructions: e.target.value,
                     }))
                   }
-                  placeholder="Any special requests or dietary requirements..."
+                  placeholder={t("checkout.specialInstructionsPlaceholder")}
                 />
               </div>
 
-              <div className="border-t border-zinc-800 pt-4">
+              <div className="border-t border-neutral-700 pt-4">
                 <div className="space-y-2">
                   {cart.map((item) => (
                     <div
                       key={item.id}
-                      className="flex justify-between text-sm bg-zinc-900 p-3 rounded"
+                      className="flex justify-between text-sm bg-neutral-700 p-3 rounded"
                     >
-                      <span className="text-gray-400 flex-1 min-w-0 truncate">
+                      <span className="text-neutral-300 flex-1 min-w-0 truncate">
                         {item.quantity}x {item.name}
                       </span>
-                      <span className="text-orange-400 font-medium ml-2">
-                        {(parseFloat(item.price) * item.quantity).toFixed(2)} $
+                      <span className="text-white font-medium ml-2">
+                        ${(parseFloat(item.price) * item.quantity).toFixed(2)}
                       </span>
                     </div>
                   ))}
-                  <div className="flex justify-between font-bold text-lg border-t border-zinc-800 pt-3">
-                    <span className="text-white">Total:</span>
-                    <span className="text-orange-400">
-                      {getTotalPrice().toFixed(2)} $
+                  <div className="flex justify-between font-bold text-lg border-t border-neutral-700 pt-3">
+                    <span className="text-white">{t("cart.total")}</span>
+                    <span className="text-white">
+                      ${getTotalPrice().toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -588,10 +743,10 @@ export default function RestaurantPage() {
 
           <div className="flex-shrink-0 pt-4">
             <Button
-              className={`w-full py-4 rounded-xl font-black transition-all duration-200 min-h-[52px] text-base tracking-wide shadow-lg ${
+              className={`w-full py-4 rounded-xl font-bold transition-all duration-200 min-h-[52px] text-base ${
                 isSubmitting || !customerInfo.phoneNumber || cart.length === 0
-                  ? "bg-zinc-700 text-gray-400 cursor-not-allowed"
-                  : "bg-orange-500 hover:bg-orange-600 text-black transform hover:scale-105 active:scale-95 hover:shadow-orange-500/30"
+                  ? "bg-neutral-600 text-neutral-400 cursor-not-allowed"
+                  : "bg-white text-neutral-900 hover:bg-neutral-100"
               }`}
               onClick={handleSubmitOrder}
               disabled={
@@ -600,11 +755,11 @@ export default function RestaurantPage() {
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                  Submitting...
+                  <div className="w-4 h-4 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin"></div>
+                  {t("checkout.submitting")}
                 </div>
               ) : (
-                "🚀 Submit Order"
+                t("checkout.submitOrder")
               )}
             </Button>
           </div>
