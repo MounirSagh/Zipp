@@ -270,10 +270,9 @@ export default function RestaurantPage() {
       <div className="bg-black border-b border-orange-500/30 sticky top-0 z-40 shadow-lg">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="text-2xl sm:text-3xl">🍽️</div>
-            <h1 className="text-xl sm:text-3xl font-bold text-orange-400 tracking-tight leading-none">
-              Restaurant Menu
-            </h1>
+            {/* <h1 className="text-xl sm:text-3xl font-bold text-orange-400 tracking-tight leading-none">
+              Zipp
+            </h1> */}
           </div>
           <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
             <DialogTrigger asChild>

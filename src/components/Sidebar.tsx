@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { Box, ChefHat, ClipboardList, LayoutDashboard } from "lucide-react";
-import { useClerk, useUser } from "@clerk/clerk-react";
+import { ChefHat, ClipboardList, LayoutDashboard } from "lucide-react";
+import { useClerk } from "@clerk/clerk-react";
 
 // Navigation items
 const mainNavItems = [
@@ -27,7 +27,6 @@ const mainNavItems = [
   { path: "/orders", label: "Orders", icon: ClipboardList },
   { path: "/menu", label: "Menu", icon: ClipboardList },
   { path: "/cuisine", label: "Cuisine", icon: ChefHat },
-  { path: "/inventory", label: "Inventory", icon: Box },
 ];
 
 // Navigation item component
@@ -59,23 +58,6 @@ function SidebarNavItem({
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar();
   const { signOut } = useClerk();
-  const { user } = useUser();
-
-  // Filter navigation items based on user type
-  const filteredNavItems = mainNavItems.filter((item) => {
-    if (user?.publicMetadata.type === "wholeseller") {
-      // For wholesellers: exclude cuisine and menu
-      if (item.path === "/cuisine" || item.path === "/menu") {
-        return false;
-      }
-    } else {
-      // For non-wholesellers: exclude inventory
-      if (item.path === "/inventory") {
-        return false;
-      }
-    }
-    return true;
-  });
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -99,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {filteredNavItems.map((item) => (
+              {mainNavItems.map((item) => (
                 <SidebarNavItem key={item.path} {...item} />
               ))}
             </SidebarMenu>

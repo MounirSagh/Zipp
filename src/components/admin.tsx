@@ -159,13 +159,7 @@ function Admin() {
       <div className="border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <h1 className="text-4xl font-light text-black mb-2">Orders</h1>
-          <p className="text-gray-600 text-lg">
-            Manage your{" "}
-            {user?.publicMetadata.type === "wholeseller"
-              ? "business"
-              : "restaurant"}{" "}
-            orders
-          </p>
+          <p className="text-gray-600 text-lg">Manage your restaurant orders</p>
         </div>
       </div>
       <div className="max-w-6xl mx-auto px-6 py-12">
@@ -256,12 +250,12 @@ function Admin() {
                       </TableCell>
                       <TableCell className="py-4">
                         <span className="text-gray-800 font-semibold">
-                          {order.location} 
+                          {order.location}
                         </span>
                       </TableCell>
-                        <TableCell className="py-4">
+                      <TableCell className="py-4">
                         <span className="text-gray-800 font-semibold">
-                          {order.table} 
+                          {order.table}
                         </span>
                       </TableCell>
                       <TableCell className="py-4 text-right">
@@ -337,7 +331,6 @@ function Admin() {
                             )}
                             {/* Actions */}
                             <div className="flex space-x-3 pt-4">
-                          
                               <Button
                                 onClick={() =>
                                   handleConfirm(order.id, order.phoneNumber)

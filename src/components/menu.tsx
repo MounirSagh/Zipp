@@ -117,6 +117,7 @@ function Menu() {
         body: JSON.stringify({
           ...categoryForm,
           restaurantId,
+          plan: user?.publicMetadata.plan,
         }),
       });
       const data = await response.json();
@@ -145,7 +146,10 @@ function Menu() {
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(categoryForm),
+          body: JSON.stringify({
+            ...categoryForm,
+            plan: user?.publicMetadata.plan,
+          }),
         }
       );
       const data = await response.json();
@@ -177,9 +181,14 @@ function Menu() {
     }
     try {
       setIsDeletingCategory(categoryId);
-      const response = await fetch(`${API_BASE}/category/${categoryId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${API_BASE}/category/${categoryId}?plan=${encodeURIComponent(
+          String(user?.publicMetadata?.plan || "")
+        )}`,
+        {
+          method: "DELETE",
+        }
+      );
       const data = await response.json();
       if (data.success) {
         await fetchMenu();
@@ -206,6 +215,7 @@ function Menu() {
           ...itemForm,
           price: Number.parseFloat(itemForm.price),
           categoryId: Number.parseInt(itemForm.categoryId),
+          plan: user?.publicMetadata?.plan,
         }),
       });
       const data = await response.json();
@@ -221,13 +231,7 @@ function Menu() {
           ingredients: "",
           categoryId: "",
         });
-        setSuccess(
-          `${
-            user?.publicMetadata.type === "wholeseller"
-              ? "Inventory item"
-              : "Menu item"
-          } created and synced to vector database`
-        );
+        setSuccess("Menu item created and synced to vector database");
       } else {
         setError(data.error || "Failed to create item");
       }
@@ -250,6 +254,7 @@ function Menu() {
           ...itemForm,
           price: Number.parseFloat(itemForm.price),
           categoryId: Number.parseInt(itemForm.categoryId),
+          plan: user?.publicMetadata?.plan,
         }),
       });
       const data = await response.json();
@@ -266,13 +271,7 @@ function Menu() {
           ingredients: "",
           categoryId: "",
         });
-        setSuccess(
-          `${
-            user?.publicMetadata.type === "wholeseller"
-              ? "Inventory item"
-              : "Menu item"
-          } updated and synced to vector database`
-        );
+        setSuccess("Menu item updated and synced to vector database");
       } else {
         setError(data.error || "Failed to update item");
       }
@@ -291,19 +290,18 @@ function Menu() {
     }
     try {
       setIsDeletingItem(itemId);
-      const response = await fetch(`${API_BASE}/item/${itemId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${API_BASE}/item/${itemId}?plan=${encodeURIComponent(
+          String(user?.publicMetadata?.plan || "")
+        )}`,
+        {
+          method: "DELETE",
+        }
+      );
       const data = await response.json();
       if (data.success) {
         await fetchMenu();
-        setSuccess(
-          `${
-            user?.publicMetadata.type === "wholeseller"
-              ? "Inventory item"
-              : "Menu item"
-          } deleted and removed from vector database`
-        );
+        setSuccess("Menu item deleted and removed from vector database");
       } else {
         setError(data.error || "Failed to delete item");
       }
@@ -324,6 +322,7 @@ function Menu() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           isAvailable: !item.isAvailable,
+          plan: user?.publicMetadata?.plan,
         }),
       });
       const data = await response.json();
@@ -426,16 +425,9 @@ function Menu() {
         <div className="border-b border-gray-100 pb-12 mb-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-4xl font-light text-black mb-2">
-                {user?.publicMetadata.type === "wholeseller"
-                  ? "Inventory"
-                  : "Menu"}
-              </h1>
+              <h1 className="text-4xl font-light text-black mb-2">Menu</h1>
               <p className="text-gray-600 text-lg">
-                Manage your{" "}
-                {user?.publicMetadata.type === "wholeseller"
-                  ? "business inventory"
-                  : "restaurant menu"}
+                Manage your restaurant menu
               </p>
             </div>
             <div className="flex gap-3">
@@ -484,18 +476,10 @@ function Menu() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
               <ShoppingCart size={48} className="mx-auto text-gray-200 mb-4" />
               <h3 className="text-2xl font-light text-black mb-2">
-                No{" "}
-                {user?.publicMetadata.type === "wholeseller"
-                  ? "inventory items"
-                  : "menu items"}{" "}
-                yet
+                No menu items yet
               </h3>
               <p className="text-gray-600 mb-4">
-                Start by creating your first{" "}
-                {user?.publicMetadata.type === "wholeseller"
-                  ? "inventory"
-                  : "menu"}{" "}
-                category
+                Start by creating your first menu category
               </p>
               <Button
                 onClick={() => openCategoryModal()}
@@ -727,9 +711,7 @@ function Menu() {
                         </h4>
                         <p className="text-sm text-gray-600">
                           {result.metadata.type === "item"
-                            ? user?.publicMetadata.type === "wholeseller"
-                              ? "Inventory Item"
-                              : "Menu Item"
+                            ? "Menu Item"
                             : "Category"}
                           {result.metadata.categoryName &&
                             ` • ${result.metadata.categoryName}`}
@@ -852,17 +834,7 @@ function Menu() {
           <DialogContent className="sm:max-w-lg rounded-2xl border-0 shadow-2xl p-6 max-h-screen overflow-y-auto">
             <DialogHeader className="pb-4">
               <DialogTitle className="text-xl font-medium text-black">
-                {editingItem
-                  ? `Edit ${
-                      user?.publicMetadata.type === "wholeseller"
-                        ? "Item"
-                        : "Menu Item"
-                    }`
-                  : `Create ${
-                      user?.publicMetadata.type === "wholeseller"
-                        ? "Item"
-                        : "Menu Item"
-                    }`}
+                {editingItem ? "Edit Menu Item" : "Create Menu Item"}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
@@ -937,11 +909,7 @@ function Menu() {
                   }
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-300 focus:border-gray-300 text-black placeholder-gray-400 resize-none"
                   rows={3}
-                  placeholder={`Describe this ${
-                    user?.publicMetadata.type === "wholeseller"
-                      ? "inventory item"
-                      : "menu item"
-                  }`}
+                  placeholder="Describe this menu item"
                 />
               </div>
               <div>
