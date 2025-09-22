@@ -423,7 +423,7 @@ export default function RestaurantPage() {
         {menu &&
           menu.map((category) => (
             <section key={category.id} className="mb-8">
-              <div className="flex text-center items-center justify-center bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg shadow-2xl shadow-yellow-300/80">
+              <div className="flex text-center items-center justify-center bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg">
                 <h2 className="text-xl sm:text-2xl font-bold text-yellow-300 mb-2">
                   {category.name}
                 </h2>
