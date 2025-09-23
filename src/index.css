@@ -144,6 +144,11 @@ html[lang="ar"] {
   font-family: "Segoe UI", "Tahoma", "Arial", sans-serif;
 }
 
+/* Qwigley font for branding */
+.font-qwigley {
+  font-family: "Qwigley", cursive;
+}
+
 /* Ensure proper spacing for RTL layouts */
 [dir="rtl"] .space-x-2 > * + * {
   margin-left: 0;

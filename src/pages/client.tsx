@@ -300,121 +300,123 @@ export default function RestaurantPage() {
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-400 bg-clip-text text-transparent tracking-tight">
-                Zipp
+              <h1 className="text-3xl font-bold text-white  font-qwigley">
+                ZIPP
               </h1>
             </div>
           </div>
-        <div className="flex items-center gap-4">
-          <LanguageSelector />
-          <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="relative bg-neutral-800 border-yellow-300/20 text-white hover:bg-neutral-700 transition-all duration-200 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm min-h-[40px] shadow-lg"
-              >
-                <ShoppingCartIcon className="w-5 h-5" />
-                <span className="hidden sm:inline ml-2">{t("cart.title")}</span>
-                {getTotalItems() > 0 && (
-                  <Badge className="absolute -top-1 -right-1 min-w-[18px] h-4 text-xs bg-red-500 text-white border-0 font-bold">
-                    {getTotalItems()}
-                  </Badge>
-                )}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="w-[95vw] max-w-sm bg-neutral-900 border-yellow-500/30 text-white rounded-2xl shadow-2xl backdrop-blur-lg flex flex-col">
-              <DialogHeader className="pb-4 border-b border-yellow-500/20 flex-shrink-0">
-                <DialogTitle className="text-xl sm:text-2xl text-white font-bold">
-                  {t("cart.title")}
-                </DialogTitle>
-              </DialogHeader>
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="relative bg-neutral-800 border-yellow-300/20 text-white hover:bg-neutral-700 transition-all duration-200 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm min-h-[40px] shadow-lg"
+                >
+                  <ShoppingCartIcon className="w-5 h-5" />
+                  <span className="hidden sm:inline ml-2">
+                    {t("cart.title")}
+                  </span>
+                  {getTotalItems() > 0 && (
+                    <Badge className="absolute -top-1 -right-1 min-w-[18px] h-4 text-xs bg-red-500 text-white border-0 font-bold">
+                      {getTotalItems()}
+                    </Badge>
+                  )}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[95vw] max-w-sm max-h-[85vh] bg-neutral-900 border-yellow-500/30 text-white rounded-2xl shadow-2xl backdrop-blur-lg flex flex-col">
+                <DialogHeader className="pb-4 border-b border-yellow-500/20 flex-shrink-0">
+                  <DialogTitle className="text-xl sm:text-2xl text-white font-bold">
+                    {t("cart.title")}
+                  </DialogTitle>
+                </DialogHeader>
 
-              <div className="flex-1 overflow-y-auto min-h-0">
-                {cart.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-3 opacity-50">🛒</div>
-                    <p className="text-neutral-400 text-sm">
-                      {t("cart.empty")}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 p-1">
-                    {cart.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between p-3 border-b border-yellow-300/20 rounded-lg"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-white text-sm truncate">
-                            {item.name}
-                          </h4>
-                          <p className="text-xs text-neutral-400">
-                            ${parseFloat(item.price).toFixed(2)}{" "}
-                            {t("cart.each")}
-                          </p>
+                <div className="flex-1 overflow-y-auto min-h-0 max-h-[50vh]">
+                  {cart.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="text-4xl mb-3 opacity-50">🛒</div>
+                      <p className="text-neutral-400 text-sm">
+                        {t("cart.empty")}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 p-1 pb-4">
+                      {cart.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-3 border-b border-yellow-300/20 rounded-lg"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-white text-sm truncate">
+                              {item.name}
+                            </h4>
+                            <p className="text-xs text-neutral-400">
+                              ${parseFloat(item.price).toFixed(2)}{" "}
+                              {t("cart.each")}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1 ml-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 w-8 h-8 min-h-[32px] text-sm"
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity - 1)
+                              }
+                            >
+                              -
+                            </Button>
+                            <span className="w-8 text-center font-medium text-white text-sm">
+                              {item.quantity}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 w-8 h-8 min-h-[32px] text-sm"
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity + 1)
+                              }
+                            >
+                              +
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="bg-red-600 hover:bg-red-700 w-8 h-8 min-h-[32px] text-sm ml-1"
+                              onClick={() => removeFromCart(item.id)}
+                            >
+                              <Trash />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1 ml-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 w-8 h-8 min-h-[32px] text-sm"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
-                          >
-                            -
-                          </Button>
-                          <span className="w-8 text-center font-medium text-white text-sm">
-                            {item.quantity}
-                          </span>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 w-8 h-8 min-h-[32px] text-sm"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                          >
-                            +
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="bg-red-600 hover:bg-red-700 w-8 h-8 min-h-[32px] text-sm ml-1"
-                            onClick={() => removeFromCart(item.id)}
-                          >
-                            <Trash />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {cart.length > 0 && (
-                <div className="border-t border-neutral-700 pt-3 mt-3 flex-shrink-0">
-                  <div className="flex justify-between items-center text-lg font-bold mb-3">
-                    <span className="text-white">{t("cart.total")}</span>
-                    <span className="text-white">
-                      ${getTotalPrice().toFixed(2)}
-                    </span>
-                  </div>
-
-                  <Button
-                    className="w-full bg-white text-neutral-900 hover:bg-neutral-100 font-bold py-4 rounded-xl transition-all duration-200 min-h-[48px]"
-                    onClick={() => {
-                      setIsCartOpen(false);
-                      setIsCheckoutOpen(true);
-                    }}
-                  >
-                    {t("cart.checkout")}
-                  </Button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </DialogContent>
-          </Dialog>
-        </div>
+
+                {cart.length > 0 && (
+                  <div className="border-t border-neutral-700 pt-3 mt-3 flex-shrink-0">
+                    <div className="flex justify-between items-center text-lg font-bold mb-3">
+                      <span className="text-white">{t("cart.total")}</span>
+                      <span className="text-white">
+                        ${getTotalPrice().toFixed(2)}
+                      </span>
+                    </div>
+
+                    <Button
+                      className="w-full bg-white text-neutral-900 hover:bg-neutral-100 font-bold py-4 rounded-xl transition-all duration-200 min-h-[48px]"
+                      onClick={() => {
+                        setIsCartOpen(false);
+                        setIsCheckoutOpen(true);
+                      }}
+                    >
+                      {t("cart.checkout")}
+                    </Button>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
 
@@ -505,110 +507,112 @@ export default function RestaurantPage() {
 
       {/* Item Detail Modal */}
       <Dialog open={selectedItem !== null} onOpenChange={closeItemModal}>
-        <DialogContent className="w-[95vw] max-w-lg bg-neutral-800 border-yellow-300/20 text-white rounded-2xl shadow-2xl">
+        <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] bg-neutral-800 border-yellow-300/20 text-white rounded-2xl shadow-2xl flex flex-col">
           {selectedItem && (
             <>
-              <DialogHeader className="pb-4 border-b border-yellow-300/20">
+              <DialogHeader className="pb-4 border-b border-yellow-300/20 flex-shrink-0">
                 <DialogTitle className="text-xl font-bold text-white">
                   {t("menu.details")}
                 </DialogTitle>
               </DialogHeader>
 
-              <div className="space-y-4">
-                {/* Item Image */}
-                {selectedItem.imageUrl && (
-                  <div className="w-full h-48 rounded-xl overflow-hidden">
-                    <img
-                      src={selectedItem.imageUrl}
-                      alt={selectedItem.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-
-                {/* Item Info */}
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-2">
-                    {selectedItem.name}
-                  </h3>
-                  {selectedItem.description && (
-                    <p className="text-neutral-300 text-sm mb-3">
-                      {selectedItem.description}
-                    </p>
-                  )}
-                  {selectedItem.ingredients && (
-                    <div className="mb-3">
-                      <p className="text-neutral-400 text-xs">
-                        <span className="font-semibold text-white">
-                          {t("menu.ingredients")}
-                        </span>{" "}
-                        {selectedItem.ingredients}
-                      </p>
+              <div className="flex-1 overflow-y-auto min-h-0">
+                <div className="space-y-4 p-1">
+                  {/* Item Image */}
+                  {selectedItem.imageUrl && (
+                    <div className="w-full h-48 rounded-xl overflow-hidden">
+                      <img
+                        src={selectedItem.imageUrl}
+                        alt={selectedItem.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   )}
-                  <div className="text-2xl font-bold text-white">
-                    ${parseFloat(selectedItem.price).toFixed(2)}
-                  </div>
-                </div>
 
-                {/* Quantity Selector */}
-                <div className="flex items-center gap-4">
-                  <span className="text-white font-medium">
-                    {t("menu.quantity")}:
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600 w-8 h-8"
-                      onClick={() =>
-                        setItemQuantity(Math.max(1, itemQuantity - 1))
-                      }
-                    >
-                      -
-                    </Button>
-                    <span className="w-8 text-center font-medium text-white">
-                      {itemQuantity}
+                  {/* Item Info */}
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {selectedItem.name}
+                    </h3>
+                    {selectedItem.description && (
+                      <p className="text-neutral-300 text-sm mb-3">
+                        {selectedItem.description}
+                      </p>
+                    )}
+                    {selectedItem.ingredients && (
+                      <div className="mb-3">
+                        <p className="text-neutral-400 text-xs">
+                          <span className="font-semibold text-white">
+                            {t("menu.ingredients")}
+                          </span>{" "}
+                          {selectedItem.ingredients}
+                        </p>
+                      </div>
+                    )}
+                    <div className="text-2xl font-bold text-white">
+                      ${parseFloat(selectedItem.price).toFixed(2)}
+                    </div>
+                  </div>
+
+                  {/* Quantity Selector */}
+                  <div className="flex items-center gap-4">
+                    <span className="text-white font-medium">
+                      {t("menu.quantity")}:
                     </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600 w-8 h-8"
-                      onClick={() => setItemQuantity(itemQuantity + 1)}
-                    >
-                      +
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600 w-8 h-8"
+                        onClick={() =>
+                          setItemQuantity(Math.max(1, itemQuantity - 1))
+                        }
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center font-medium text-white">
+                        {itemQuantity}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600 w-8 h-8"
+                        onClick={() => setItemQuantity(itemQuantity + 1)}
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Add to Cart Button */}
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1 bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600"
-                    onClick={closeItemModal}
-                  >
-                    {t("menu.close")}
-                  </Button>
-                  <Button
-                    className={`flex-1 ${
-                      selectedItem.isAvailable
-                        ? "bg-white text-neutral-900 hover:bg-neutral-100"
-                        : "bg-neutral-600 text-neutral-400 cursor-not-allowed"
-                    } font-semibold`}
-                    onClick={() => {
-                      if (selectedItem.isAvailable) {
-                        addToCartWithQuantity(selectedItem, itemQuantity);
-                        closeItemModal();
-                      }
-                    }}
-                    disabled={!selectedItem.isAvailable}
-                  >
-                    {selectedItem.isAvailable
-                      ? t("menu.addToCart")
-                      : t("menu.notAvailable")}
-                  </Button>
-                </div>
+              {/* Add to Cart Button */}
+              <div className="flex gap-3 pt-4 border-t border-yellow-300/20 flex-shrink-0">
+                <Button
+                  variant="outline"
+                  className="flex-1 bg-neutral-700 border-neutral-600 text-white hover:bg-neutral-600"
+                  onClick={closeItemModal}
+                >
+                  {t("menu.close")}
+                </Button>
+                <Button
+                  className={`flex-1 ${
+                    selectedItem.isAvailable
+                      ? "bg-white text-neutral-900 hover:bg-neutral-100"
+                      : "bg-neutral-600 text-neutral-400 cursor-not-allowed"
+                  } font-semibold`}
+                  onClick={() => {
+                    if (selectedItem.isAvailable) {
+                      addToCartWithQuantity(selectedItem, itemQuantity);
+                      closeItemModal();
+                    }
+                  }}
+                  disabled={!selectedItem.isAvailable}
+                >
+                  {selectedItem.isAvailable
+                    ? t("menu.addToCart")
+                    : t("menu.notAvailable")}
+                </Button>
               </div>
             </>
           )}
