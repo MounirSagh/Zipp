@@ -632,7 +632,7 @@ export default function RestaurantPage() {
             <div className="space-y-4 p-1">
               <div>
                 <label className="block text-sm font-semibold mb-2 text-white">
-                  {t("checkout.phoneRequired")}
+                  {t("checkout.phoneRequired")} {" "} ({t("checkout.optionality")})
                 </label>
                 <Input
                   type="tel"
@@ -652,7 +652,7 @@ export default function RestaurantPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-semibold mb-2 text-white">
-                    {t("checkout.firstName")}
+                    {t("checkout.firstName")} {" "} ({t("checkout.optionality")})
                   </label>
                   <Input
                     value={customerInfo.firstName}
@@ -668,7 +668,7 @@ export default function RestaurantPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2 text-white">
-                    {t("checkout.lastName")}
+                    {t("checkout.lastName")} {" "} ({t("checkout.optionality")})
                   </label>
                   <Input
                     value={customerInfo.lastName}
@@ -703,7 +703,7 @@ export default function RestaurantPage() {
 
               <div>
                 <label className="block text-sm font-semibold mb-2 text-white">
-                  {t("checkout.specialInstructions")}
+                  {t("checkout.specialInstructions")} {" "} ({t("checkout.optionality")})
                 </label>
                 <textarea
                   className="w-full p-3 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:border-neutral-500 focus:outline-none resize-none text-base min-h-[80px]"

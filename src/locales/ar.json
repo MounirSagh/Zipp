@@ -26,6 +26,7 @@
   },
   "checkout": {
     "title": "الدفع",
+    "optionality": "اختياري",
     "phoneNumber": "رقم الهاتف",
     "phoneRequired": "رقم الهاتف *",
     "firstName": "الاسم الأول",

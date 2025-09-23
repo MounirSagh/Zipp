@@ -26,6 +26,7 @@
   },
   "checkout": {
     "title": "Paiement",
+    "optionality": "optionnel",
     "phoneNumber": "Numéro de Téléphone",
     "phoneRequired": "Numéro de Téléphone *",
     "firstName": "Prénom",

@@ -26,8 +26,9 @@
   },
   "checkout": {
     "title": "Checkout",
+    "optionality": "optional",
     "phoneNumber": "Phone Number",
-    "phoneRequired": "Phone Number *",
+    "phoneRequired": "Phone Number",
     "firstName": "First Name",
     "lastName": "Last Name",
     "table": "Table",
