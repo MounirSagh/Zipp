@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCartIcon, Trash } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -44,19 +43,21 @@ type CartItem = MenuItem & {
 };
 
 type CustomerInfo = {
-  phoneNumber: string;
-  firstName: string;
-  lastName: string;
   specialInstructions: string;
-  location: string;
   table: string;
 };
 
 type ApiResp<T> = { success: boolean; data: T; error?: string };
 
 export default function RestaurantPage() {
-  const { code = "" } = useParams();
+  const { code = "", table = "" } = useParams<{
+    code: string;
+    table: string;
+  }>();
   const { t } = useTranslation();
+
+  // Get table number from URL parameters
+  const tableNumber = table;
   const [menu, setMenu] = useState<MenuCategory[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,12 +67,8 @@ export default function RestaurantPage() {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [itemQuantity, setItemQuantity] = useState(1);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
-    phoneNumber: "",
-    firstName: "",
-    lastName: "",
     specialInstructions: "",
-    location: "Dine-in",
-    table: "",
+    table: tableNumber,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -170,8 +167,8 @@ export default function RestaurantPage() {
   };
 
   const handleSubmitOrder = async () => {
-    if (!customerInfo.phoneNumber || cart.length === 0) {
-      alert(t("checkout.validation.fillPhone"));
+    if (cart.length === 0) {
+      alert(t("checkout.validation.emptyCart"));
       return;
     }
 
@@ -185,6 +182,20 @@ export default function RestaurantPage() {
         quantity: item.quantity,
       }));
 
+      const orderData = {
+        restaurantId,
+        phoneNumber: "-",
+        firstName: "-",
+        lastName: "-",
+        orderItems,
+        totalAmount: getTotalPrice(),
+        specialInstructions: customerInfo.specialInstructions || "-",
+        location: "-",
+        table: tableNumber,
+      };
+
+      console.log("Sending order data:", orderData);
+
       const response = await fetch(
         "https://zipp-backend.vercel.app/api/orders/create",
         {
@@ -192,17 +203,7 @@ export default function RestaurantPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            restaurantId,
-            phoneNumber: customerInfo.phoneNumber,
-            firstName: customerInfo.firstName,
-            lastName: customerInfo.lastName,
-            orderItems,
-            totalAmount: getTotalPrice(),
-            specialInstructions: customerInfo.specialInstructions,
-            location: customerInfo.location,
-            table: customerInfo.table,
-          }),
+          body: JSON.stringify(orderData),
         }
       );
 
@@ -211,12 +212,8 @@ export default function RestaurantPage() {
         setOrderSuccess(true);
         setCart([]);
         setCustomerInfo({
-          phoneNumber: "",
-          firstName: "",
-          lastName: "",
           specialInstructions: "",
-          location: "Dine-in",
-          table: "",
+          table: tableNumber,
         });
         setIsCheckoutOpen(false);
       } else {
@@ -326,7 +323,7 @@ export default function RestaurantPage() {
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-sm max-h-[85vh] bg-neutral-900 border-yellow-500/30 text-white rounded-2xl shadow-2xl backdrop-blur-lg flex flex-col">
                 <DialogHeader className="pb-4 border-b border-yellow-500/20 flex-shrink-0">
-                  <DialogTitle className="text-xl sm:text-2xl text-white font-bold">
+                  <DialogTitle className="text-xl sm:text-2xl text-white font-bold text-center">
                     {t("cart.title")}
                   </DialogTitle>
                 </DialogHeader>
@@ -345,8 +342,9 @@ export default function RestaurantPage() {
                         <div
                           key={item.id}
                           className="flex items-center justify-between p-3 border-b border-yellow-300/20 rounded-lg"
+                          dir="ltr"
                         >
-                          <div className="flex-1 min-w-0">
+                          <div className="flex-1 min-w-0 rtl:text-right ltr:text-left">
                             <h4 className="font-semibold text-white text-sm truncate">
                               {item.name}
                             </h4>
@@ -355,7 +353,10 @@ export default function RestaurantPage() {
                               {t("cart.each")}
                             </p>
                           </div>
-                          <div className="flex items-center gap-1 ml-2">
+                          <div
+                            className="flex items-center gap-1 rtl:mr-2 ltr:ml-2"
+                            dir="ltr"
+                          >
                             <Button
                               size="sm"
                               variant="outline"
@@ -396,7 +397,10 @@ export default function RestaurantPage() {
 
                 {cart.length > 0 && (
                   <div className="border-t border-neutral-700 pt-3 mt-3 flex-shrink-0">
-                    <div className="flex justify-between items-center text-lg font-bold mb-3">
+                    <div
+                      className="flex justify-between items-center text-lg font-bold mb-3"
+                      dir="ltr"
+                    >
                       <span className="text-white">{t("cart.total")}</span>
                       <span className="text-white">
                         ${getTotalPrice().toFixed(2)}
@@ -630,80 +634,21 @@ export default function RestaurantPage() {
 
           <div className="flex-1 overflow-y-auto min-h-0">
             <div className="space-y-4 p-1">
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-white">
-                  {t("checkout.phoneRequired")} {" "} ({t("checkout.optionality")})
-                </label>
-                <Input
-                  type="tel"
-                  value={customerInfo.phoneNumber}
-                  onChange={(e) =>
-                    setCustomerInfo((prev) => ({
-                      ...prev,
-                      phoneNumber: e.target.value,
-                    }))
-                  }
-                  placeholder={t("placeholders.phoneNumber")}
-                  className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 focus:border-neutral-500 h-12 text-base"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-white">
-                    {t("checkout.firstName")} {" "} ({t("checkout.optionality")})
-                  </label>
-                  <Input
-                    value={customerInfo.firstName}
-                    onChange={(e) =>
-                      setCustomerInfo((prev) => ({
-                        ...prev,
-                        firstName: e.target.value,
-                      }))
-                    }
-                    placeholder={t("placeholders.firstName")}
-                    className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 focus:border-neutral-500 h-12 text-base"
-                  />
+              {tableNumber && (
+                <div className="bg-neutral-700 p-3 rounded-lg border border-yellow-300/20">
+                  <div className="text-sm font-semibold text-white mb-1">
+                    {t("checkout.table")}
+                  </div>
+                  <div className="text-yellow-300 font-bold text-lg">
+                    {tableNumber}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-white">
-                    {t("checkout.lastName")} {" "} ({t("checkout.optionality")})
-                  </label>
-                  <Input
-                    value={customerInfo.lastName}
-                    onChange={(e) =>
-                      setCustomerInfo((prev) => ({
-                        ...prev,
-                        lastName: e.target.value,
-                      }))
-                    }
-                    placeholder={t("placeholders.lastName")}
-                    className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 focus:border-neutral-500 h-12 text-base"
-                  />
-                </div>
-              </div>
+              )}
 
               <div>
                 <label className="block text-sm font-semibold mb-2 text-white">
-                  {t("checkout.table")}
-                </label>
-                <Input
-                  value={customerInfo.table}
-                  onChange={(e) =>
-                    setCustomerInfo((prev) => ({
-                      ...prev,
-                      table: e.target.value,
-                    }))
-                  }
-                  placeholder={t("checkout.tableNumber")}
-                  className="bg-neutral-700 border-neutral-600 text-white placeholder-neutral-400 focus:border-neutral-500 h-12 text-base"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-white">
-                  {t("checkout.specialInstructions")} {" "} ({t("checkout.optionality")})
+                  {t("checkout.specialInstructions")} (
+                  {t("checkout.optionality")})
                 </label>
                 <textarea
                   className="w-full p-3 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:border-neutral-500 focus:outline-none resize-none text-base min-h-[80px]"
@@ -748,14 +693,12 @@ export default function RestaurantPage() {
           <div className="flex-shrink-0 pt-4">
             <Button
               className={`w-full py-4 rounded-xl font-bold transition-all duration-200 min-h-[52px] text-base ${
-                isSubmitting || !customerInfo.phoneNumber || cart.length === 0
+                isSubmitting || cart.length === 0
                   ? "bg-neutral-600 text-neutral-400 cursor-not-allowed"
                   : "bg-white text-neutral-900 hover:bg-neutral-100"
               }`}
               onClick={handleSubmitOrder}
-              disabled={
-                isSubmitting || !customerInfo.phoneNumber || cart.length === 0
-              }
+              disabled={isSubmitting || cart.length === 0}
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
