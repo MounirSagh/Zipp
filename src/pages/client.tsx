@@ -444,19 +444,15 @@ export default function RestaurantPage() {
                       onClick={() => openItemModal(item)}
                       className="bg-neutral-900 border border-yellow-300/20 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-neutral-750 transition-all duration-200 touch-manipulation active:scale-98"
                     >
-                      <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
-                        {item.imageUrl ? (
+                      {item.imageUrl && (
+                        <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
                           <img
                             src={item.imageUrl}
                             alt={item.name}
                             className="w-full h-full object-cover"
                           />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-neutral-600 to-neutral-700 flex items-center justify-center">
-                            <span className="text-2xl">🍽️</span>
-                          </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
 
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-white text-base sm:text-lg mb-1 truncate">
