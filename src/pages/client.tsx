@@ -345,7 +345,7 @@ export default function RestaurantPage() {
                               {item.name}
                             </h4>
                             <p className="text-xs text-neutral-400">
-                              ${parseFloat(item.price).toFixed(2)}{" "}
+                              MAD{parseFloat(item.price).toFixed(2)}{" "}
                               {t("cart.each")}
                             </p>
                           </div>
@@ -399,7 +399,7 @@ export default function RestaurantPage() {
                     >
                       <span className="text-white">{t("cart.total")}</span>
                       <span className="text-white">
-                        ${getTotalPrice().toFixed(2)}
+                        MAD{getTotalPrice().toFixed(2)}
                       </span>
                     </div>
 
@@ -465,7 +465,7 @@ export default function RestaurantPage() {
                         )}
                         <div className="flex items-center justify-between">
                           <span className="text-white font-bold text-lg">
-                            ${parseFloat(item.price).toFixed(2)}
+                            MAD{parseFloat(item.price).toFixed(2)}
                           </span>
                           <div className="flex items-center gap-2">
                             {!item.isAvailable && (
@@ -542,7 +542,7 @@ export default function RestaurantPage() {
                       </div>
                     )}
                     <div className="text-2xl font-bold text-white">
-                      ${parseFloat(selectedItem.price).toFixed(2)}
+                      MAD{parseFloat(selectedItem.price).toFixed(2)}
                     </div>
                   </div>
 
@@ -660,14 +660,14 @@ export default function RestaurantPage() {
                         {item.quantity}x {item.name}
                       </span>
                       <span className="text-white font-medium ml-2">
-                        ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                        MAD{(parseFloat(item.price) * item.quantity).toFixed(2)}
                       </span>
                     </div>
                   ))}
                   <div className="flex justify-between font-bold text-lg border-t border-neutral-700 pt-3">
                     <span className="text-white">{t("cart.total")}</span>
                     <span className="text-white">
-                      ${getTotalPrice().toFixed(2)}
+                      MAD{getTotalPrice().toFixed(2)}
                     </span>
                   </div>
                 </div>
