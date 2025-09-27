@@ -44,6 +44,7 @@ type CartItem = MenuItem & {
 type CustomerInfo = {
   specialInstructions: string;
   table: string;
+  location: string;
 };
 
 type ApiResp<T> = { success: boolean; data: T; error?: string };
@@ -67,6 +68,7 @@ export default function RestaurantPage() {
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     specialInstructions: "",
     table: tableNumber,
+    location: "dine-in",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -188,7 +190,7 @@ export default function RestaurantPage() {
         orderItems,
         totalAmount: getTotalPrice(),
         specialInstructions: customerInfo.specialInstructions || "-",
-        location: "-",
+        location: customerInfo.location,
         table: tableNumber,
       };
 
@@ -212,6 +214,7 @@ export default function RestaurantPage() {
         setCustomerInfo({
           specialInstructions: "",
           table: tableNumber,
+          location: "dine-in",
         });
         setIsCheckoutOpen(false);
       } else {
@@ -629,6 +632,46 @@ export default function RestaurantPage() {
                   </div>
                 </div>
               )}
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-white">
+                  {t("checkout.location")}
+                </label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      setCustomerInfo((prev) => ({
+                        ...prev,
+                        location: "dine-in",
+                      }))
+                    }
+                    className={`flex-1 py-3 rounded-lg font-medium transition-all duration-200 ${
+                      customerInfo.location === "dine-in"
+                        ? "bg-white text-neutral-900 hover:bg-neutral-100"
+                        : "bg-neutral-700 border border-neutral-600 text-white hover:bg-neutral-600"
+                    }`}
+                  >
+                    {t("checkout.locationOptions.dineIn")}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      setCustomerInfo((prev) => ({
+                        ...prev,
+                        location: "take-home",
+                      }))
+                    }
+                    className={`flex-1 py-3 rounded-lg font-medium transition-all duration-200 ${
+                      customerInfo.location === "take-home"
+                        ? "bg-white text-neutral-900 hover:bg-neutral-100"
+                        : "bg-neutral-700 border border-neutral-600 text-white hover:bg-neutral-600"
+                    }`}
+                  >
+                    {t("checkout.locationOptions.takeHome")}
+                  </Button>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-semibold mb-2 text-white">

@@ -33,12 +33,18 @@
     "lastName": "اسم العائلة",
     "table": "الطاولة",
     "tableNumber": "رقم الطاولة",
+    "location": "الموقع",
+    "locationOptions": {
+      "takeHome": "استلام",
+      "dineIn": "تناول في المطعم"
+    },
     "specialInstructions": "تعليمات خاصة",
     "specialInstructionsPlaceholder": "أي طلبات خاصة أو متطلبات غذائية...",
     "submitOrder": "إرسال الطلب",
     "submitting": "جاري الإرسال...",
     "validation": {
-      "fillPhone": "يرجى ملء رقم هاتفك وإضافة عناصر إلى سلة التسوق"
+      "fillPhone": "يرجى ملء رقم هاتفك وإضافة عناصر إلى سلة التسوق",
+      "emptyCart": "سلة التسوق فارغة"
     }
   },
   "placeholders": {

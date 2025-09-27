@@ -33,12 +33,18 @@
     "lastName": "Last Name",
     "table": "Table",
     "tableNumber": "Table number",
+    "location": "Location",
+    "locationOptions": {
+      "takeHome": "Take Home",
+      "dineIn": "Dine In"
+    },
     "specialInstructions": "Special Instructions",
     "specialInstructionsPlaceholder": "Any special requests or dietary requirements...",
     "submitOrder": "Submit Order",
     "submitting": "Submitting...",
     "validation": {
-      "fillPhone": "Please fill in your phone number and add items to your cart"
+      "fillPhone": "Please fill in your phone number and add items to your cart",
+      "emptyCart": "Your cart is empty"
     }
   },
   "placeholders": {

@@ -33,12 +33,18 @@
     "lastName": "Nom",
     "table": "Table",
     "tableNumber": "Numéro de table",
+    "location": "Emplacement",
+    "locationOptions": {
+      "takeHome": "À Emporter",
+      "dineIn": "Sur Place"
+    },
     "specialInstructions": "Instructions Spéciales",
     "specialInstructionsPlaceholder": "Des demandes spéciales ou des exigences alimentaires...",
     "submitOrder": "Soumettre la Commande",
     "submitting": "Soumission...",
     "validation": {
-      "fillPhone": "Veuillez remplir votre numéro de téléphone et ajouter des articles à votre panier"
+      "fillPhone": "Veuillez remplir votre numéro de téléphone et ajouter des articles à votre panier",
+      "emptyCart": "Votre panier est vide"
     }
   },
   "placeholders": {
