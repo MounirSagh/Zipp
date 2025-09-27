@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Plus,
   Edit2,
@@ -10,7 +10,25 @@ import {
   ShoppingCart,
   Eye,
   EyeOff,
+  GripVertical,
 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -21,6 +39,239 @@ import {
 } from "@/components/ui/dialog";
 import { useUser } from "@clerk/clerk-react";
 import ImageUpload from "./ImageUpload";
+
+// Sortable Category Component
+function SortableCategory({
+  category,
+  onEdit,
+  onDelete,
+  onAddItem,
+  onEditItem,
+  onDeleteItem,
+  onToggleAvailability,
+  isDeletingCategory,
+  isDeletingItem,
+  isTogglingAvailability,
+}: {
+  category: any;
+  onEdit: (category: any) => void;
+  onDelete: (categoryId: number) => void;
+  onAddItem: (item: any, categoryId: string) => void;
+  onEditItem: (item: any) => void;
+  onDeleteItem: (itemId: number) => void;
+  onToggleAvailability: (item: any) => void;
+  isDeletingCategory: number | null;
+  isDeletingItem: number | null;
+  isTogglingAvailability: number | null;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <Card className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        {/* Category Header */}
+        <CardHeader className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div
+                {...attributes}
+                {...listeners}
+                className="cursor-grab hover:cursor-grabbing p-1 rounded hover:bg-gray-200 transition-colors"
+              >
+                <GripVertical size={20} className="text-gray-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-black">
+                  {category.name}
+                </h2>
+                {category.description && (
+                  <p className="text-gray-600 mt-1">{category.description}</p>
+                )}
+                <p className="text-sm text-gray-600 mt-1">
+                  {category.items.length} item
+                  {category.items.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => onAddItem(null, category.id)}
+                className="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 flex items-center gap-2"
+              >
+                <Plus size={16} />
+                Add Item
+              </Button>
+              <Button
+                onClick={() => onEdit(category)}
+                variant="ghost"
+                size="icon"
+                className="text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full"
+              >
+                <Edit2 size={16} />
+              </Button>
+              <Button
+                onClick={() => onDelete(category.id)}
+                variant="ghost"
+                size="icon"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
+                disabled={isDeletingCategory === category.id}
+              >
+                {isDeletingCategory === category.id ? (
+                  <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Trash2 size={16} />
+                )}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        {/* Menu Items */}
+        <CardContent className="p-6">
+          {category.items.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No items in this category yet</p>
+              <Button
+                onClick={() => onAddItem(null, category.id)}
+                variant="link"
+                className="mt-2 text-blue-600 hover:text-blue-700"
+              >
+                Add the first item
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {category.items.map((item: any) => (
+                <div
+                  key={item.id}
+                  className={`border rounded-xl p-4 transition-all duration-200 ${
+                    item.isAvailable
+                      ? "border-gray-100 hover:border-gray-200"
+                      : "border-red-100 bg-red-50"
+                  }`}
+                >
+                  {/* Item Image */}
+                  <div className="w-full h-32 bg-gray-100 rounded-lg mb-3 overflow-hidden flex items-center justify-center">
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // On error, show placeholder
+                          const target = e.currentTarget;
+                          target.style.display = "none";
+                          const placeholder =
+                            target.nextElementSibling as HTMLElement;
+                          if (placeholder) {
+                            placeholder.style.display = "flex";
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className={`w-full h-full flex items-center justify-center text-gray-400 ${
+                        item.imageUrl ? "hidden" : "flex"
+                      }`}
+                    >
+                      <div className="text-center">
+                        <svg
+                          className="w-8 h-8 mx-auto mb-1"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <p className="text-xs">No image</p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Item Details */}
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium text-black truncate flex-1 mr-2">
+                      {item.name}
+                    </h3>
+                    <span className="text-lg font-semibold text-green-600 whitespace-nowrap">
+                      ${Number.parseFloat(item.price).toFixed(2)}
+                    </span>
+                  </div>
+                  {item.description && (
+                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
+                  {item.ingredients && (
+                    <p className="text-xs text-gray-500 mb-3 line-clamp-1">
+                      <strong>Ingredients:</strong> {item.ingredients}
+                    </p>
+                  )}
+                  {/* Item Actions */}
+                  <div className="flex justify-between items-center">
+                    <Button
+                      onClick={() => onToggleAvailability(item)}
+                      disabled={isTogglingAvailability === item.id}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors disabled:opacity-50 ${
+                        item.isAvailable
+                          ? "bg-green-100 text-green-800 hover:bg-green-200"
+                          : "bg-red-100 text-red-800 hover:bg-red-200"
+                      }`}
+                    >
+                      {isTogglingAvailability === item.id ? (
+                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin inline mr-1" />
+                      ) : item.isAvailable ? (
+                        <>
+                          <Eye size={12} className="inline mr-1" />
+                          Available
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff size={12} className="inline mr-1" />
+                          Unavailable
+                        </>
+                      )}
+                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        onClick={() => onEditItem(item)}
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-600 hover:text-gray-800 p-1 rounded-full hover:bg-gray-100"
+                      >
+                        <Edit2 size={14} />
+                      </Button>
+                      <Button
+                        onClick={() => onDeleteItem(item.id)}
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-600 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
+                        disabled={isDeletingItem === item.id}
+                      >
+                        {isDeletingItem === item.id ? (
+                          <div className="w-3.5 h-3.5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 size={14} />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 function Menu() {
   const [menu, setMenu] = useState<any[]>([]);
@@ -72,6 +323,61 @@ function Menu() {
 
   const API_BASE = "https://zipp-backend.vercel.app/api/menu";
 
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = sortedMenu.findIndex(
+        (category) => category.id === active.id
+      );
+      const newIndex = sortedMenu.findIndex(
+        (category) => category.id === over?.id
+      );
+
+      const newSortedMenu = arrayMove(sortedMenu, oldIndex, newIndex);
+
+      // Create a new menu array with updated order values
+      const updatedMenu = newSortedMenu.map((category, index) => ({
+        ...category,
+        order: index + 1,
+      }));
+
+      // Update local state immediately for better UX
+      setMenu(updatedMenu);
+
+      // Update order values based on new positions and send to backend
+      try {
+        const updatePromises = updatedMenu.map((category, index) =>
+          fetch(`${API_BASE}/category/${category.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              order: index + 1, // 1-based ordering
+              plan: user?.publicMetadata.plan,
+            }),
+          })
+        );
+
+        await Promise.all(updatePromises);
+        setSuccess("Category order updated successfully");
+      } catch (err) {
+        setError("Failed to update category order");
+        console.error(err);
+        // Revert local state on error
+        fetchMenu();
+      }
+    }
+  };
+
   // Auto-clear messages
   useEffect(() => {
     if (error) {
@@ -111,11 +417,14 @@ function Menu() {
   const createCategory = async () => {
     try {
       setIsCreatingCategory(true);
+      // Calculate next order value
+      const maxOrder = Math.max(...menu.map((cat) => cat.order || 0), 0);
       const response = await fetch(`${API_BASE}/category`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...categoryForm,
+          order: maxOrder + 1,
           restaurantId,
           plan: user?.publicMetadata.plan,
         }),
@@ -386,6 +695,11 @@ function Menu() {
     setShowItemModal(true);
   };
 
+  // Create a stable sorted menu array using useMemo
+  const sortedMenu = useMemo(() => {
+    return [...menu].sort((a, b) => (a.order || 0) - (b.order || 0));
+  }, [menu]);
+
   useEffect(() => {
     if (isSignedIn && user?.id) {
       fetchMenu();
@@ -489,201 +803,34 @@ function Menu() {
               </Button>
             </div>
           ) : (
-            menu.map((category) => (
-              <Card
-                key={category.id}
-                className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100"
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={sortedMenu.map((cat) => cat.id)}
+                strategy={verticalListSortingStrategy}
               >
-                {/* Category Header */}
-                <CardHeader className="bg-gray-50 px-6 py-4 border-b border-gray-100">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h2 className="text-xl font-semibold text-black">
-                        {category.name}
-                      </h2>
-                      {category.description && (
-                        <p className="text-gray-600 mt-1">
-                          {category.description}
-                        </p>
-                      )}
-                      <p className="text-sm text-gray-600 mt-1">
-                        {category.items.length} item
-                        {category.items.length !== 1 ? "s" : ""}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => openItemModal(null, category.id)}
-                        className="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 flex items-center gap-2"
-                      >
-                        <Plus size={16} />
-                        Add Item
-                      </Button>
-                      <Button
-                        onClick={() => openCategoryModal(category)}
-                        variant="ghost"
-                        size="icon"
-                        className="text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full"
-                      >
-                        <Edit2 size={16} />
-                      </Button>
-                      <Button
-                        onClick={() => deleteCategory(category.id)}
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
-                        disabled={isDeletingCategory === category.id}
-                      >
-                        {isDeletingCategory === category.id ? (
-                          <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Trash2 size={16} />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                {/* Menu Items */}
-                <CardContent className="p-6">
-                  {category.items.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">
-                        No items in this category yet
-                      </p>
-                      <Button
-                        onClick={() => openItemModal(null, category.id)}
-                        variant="link"
-                        className="mt-2 text-blue-600 hover:text-blue-700"
-                      >
-                        Add the first item
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {category.items.map((item: any) => (
-                        <div
-                          key={item.id}
-                          className={`border rounded-xl p-4 transition-all duration-200 ${
-                            item.isAvailable
-                              ? "border-gray-100 hover:border-gray-200"
-                              : "border-red-100 bg-red-50"
-                          }`}
-                        >
-                          {/* Item Image */}
-                          <div className="w-full h-32 bg-gray-100 rounded-lg mb-3 overflow-hidden flex items-center justify-center">
-                            {item.imageUrl ? (
-                              <img
-                                src={item.imageUrl}
-                                alt={item.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  // On error, show placeholder
-                                  const target = e.currentTarget;
-                                  target.style.display = "none";
-                                  const placeholder =
-                                    target.nextElementSibling as HTMLElement;
-                                  if (placeholder) {
-                                    placeholder.style.display = "flex";
-                                  }
-                                }}
-                              />
-                            ) : null}
-                            <div
-                              className={`w-full h-full flex items-center justify-center text-gray-400 ${
-                                item.imageUrl ? "hidden" : "flex"
-                              }`}
-                            >
-                              <div className="text-center">
-                                <svg
-                                  className="w-8 h-8 mx-auto mb-1"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                                <p className="text-xs">No image</p>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Item Details */}
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-medium text-black truncate flex-1 mr-2">
-                              {item.name}
-                            </h3>
-                            <span className="text-lg font-semibold text-green-600 whitespace-nowrap">
-                              ${Number.parseFloat(item.price).toFixed(2)}
-                            </span>
-                          </div>
-                          {item.description && (
-                            <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                              {item.description}
-                            </p>
-                          )}
-                          {item.ingredients && (
-                            <p className="text-xs text-gray-500 mb-3 line-clamp-1">
-                              <strong>Ingredients:</strong> {item.ingredients}
-                            </p>
-                          )}
-                          {/* Item Actions */}
-                          <div className="flex justify-between items-center">
-                            <Button
-                              onClick={() => toggleAvailability(item)}
-                              disabled={isTogglingAvailability === item.id}
-                              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors disabled:opacity-50 ${
-                                item.isAvailable
-                                  ? "bg-green-100 text-green-800 hover:bg-green-200"
-                                  : "bg-red-100 text-red-800 hover:bg-red-200"
-                              }`}
-                            >
-                              {isTogglingAvailability === item.id ? (
-                                <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin inline mr-1" />
-                              ) : item.isAvailable ? (
-                                <>
-                                  <Eye size={12} className="inline mr-1" />
-                                  Available
-                                </>
-                              ) : (
-                                <>
-                                  <EyeOff size={12} className="inline mr-1" />
-                                  Unavailable
-                                </>
-                              )}
-                            </Button>
-                            <div className="flex gap-1">
-                              <Button
-                                onClick={() => openItemModal(item)}
-                                variant="ghost"
-                                size="icon"
-                                className="text-gray-600 hover:text-gray-800 p-1 rounded-full hover:bg-gray-100"
-                              >
-                                <Edit2 size={14} />
-                              </Button>
-                              <Button
-                                onClick={() => deleteItem(item.id)}
-                                variant="ghost"
-                                size="icon"
-                                className="text-red-600 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
-                                disabled={isDeletingItem === item.id}
-                              >
-                                {isDeletingItem === item.id ? (
-                                  <div className="w-3.5 h-3.5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  <Trash2 size={14} />
-                                )}
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))
+                <div className="space-y-8">
+                  {sortedMenu.map((category) => (
+                    <SortableCategory
+                      key={category.id}
+                      category={category}
+                      onEdit={openCategoryModal}
+                      onDelete={deleteCategory}
+                      onAddItem={openItemModal}
+                      onEditItem={openItemModal}
+                      onDeleteItem={deleteItem}
+                      onToggleAvailability={toggleAvailability}
+                      isDeletingCategory={isDeletingCategory}
+                      isDeletingItem={isDeletingItem}
+                      isTogglingAvailability={isTogglingAvailability}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
 

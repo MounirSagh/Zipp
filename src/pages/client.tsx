@@ -33,6 +33,7 @@ type MenuCategory = {
   id: number;
   name: string;
   description?: string;
+  order?: number;
   items: MenuItem[];
 };
 
@@ -421,84 +422,86 @@ export default function RestaurantPage() {
 
       <div className="container mx-auto px-4 py-6">
         {menu &&
-          menu.map((category) => (
-            <section key={category.id} className="mb-8">
-              <div className="flex text-center items-center justify-center bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg">
-                <h2 className="text-xl sm:text-2xl font-bold text-yellow-300 mb-2">
-                  {category.name}
-                </h2>
-                {category.description && (
-                  <p className="text-neutral-400 text-sm sm:text-base mb-4">
-                    {category.description}
-                  </p>
-                )}
-              </div>
+          menu
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map((category) => (
+              <section key={category.id} className="mb-8">
+                <div className="flex text-center items-center justify-center bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg">
+                  <h2 className="text-xl sm:text-2xl font-bold text-yellow-300 mb-2">
+                    {category.name}
+                  </h2>
+                  {category.description && (
+                    <p className="text-neutral-400 text-sm sm:text-base mb-4">
+                      {category.description}
+                    </p>
+                  )}
+                </div>
 
-              <div className="space-y-4">
-                {category.items.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => openItemModal(item)}
-                    className="bg-neutral-900 border border-yellow-300/20 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-neutral-750 transition-all duration-200 touch-manipulation active:scale-98"
-                  >
-                    <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
-                      {item.imageUrl ? (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-neutral-600 to-neutral-700 flex items-center justify-center">
-                          <span className="text-2xl">🍽️</span>
-                        </div>
-                      )}
-                    </div>
+                <div className="space-y-4">
+                  {category.items.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => openItemModal(item)}
+                      className="bg-neutral-900 border border-yellow-300/20 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-neutral-750 transition-all duration-200 touch-manipulation active:scale-98"
+                    >
+                      <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
+                        {item.imageUrl ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-neutral-600 to-neutral-700 flex items-center justify-center">
+                            <span className="text-2xl">🍽️</span>
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white text-base sm:text-lg mb-1 truncate">
-                        {item.name}
-                      </h3>
-                      {item.description && (
-                        <p className="text-neutral-400 text-sm line-clamp-2 mb-2">
-                          {item.description}
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <span className="text-white font-bold text-lg">
-                          ${parseFloat(item.price).toFixed(2)}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          {!item.isAvailable && (
-                            <span className="text-red-400 text-xs font-medium">
-                              {t("menu.notAvailable")}
-                            </span>
-                          )}
-                          <div
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (item.isAvailable) {
-                                addToCart(item);
-                              }
-                            }}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
-                              item.isAvailable
-                                ? "bg-neutral-600 hover:bg-neutral-500 cursor-pointer active:scale-95"
-                                : "bg-neutral-700 cursor-not-allowed opacity-50"
-                            }`}
-                          >
-                            <span className="text-white text-lg font-bold">
-                              +
-                            </span>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-white text-base sm:text-lg mb-1 truncate">
+                          {item.name}
+                        </h3>
+                        {item.description && (
+                          <p className="text-neutral-400 text-sm line-clamp-2 mb-2">
+                            {item.description}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <span className="text-white font-bold text-lg">
+                            ${parseFloat(item.price).toFixed(2)}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            {!item.isAvailable && (
+                              <span className="text-red-400 text-xs font-medium">
+                                {t("menu.notAvailable")}
+                              </span>
+                            )}
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (item.isAvailable) {
+                                  addToCart(item);
+                                }
+                              }}
+                              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                                item.isAvailable
+                                  ? "bg-neutral-600 hover:bg-neutral-500 cursor-pointer active:scale-95"
+                                  : "bg-neutral-700 cursor-not-allowed opacity-50"
+                              }`}
+                            >
+                              <span className="text-white text-lg font-bold">
+                                +
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
+                  ))}
+                </div>
+              </section>
+            ))}
       </div>
 
       <Dialog open={selectedItem !== null} onOpenChange={closeItemModal}>
