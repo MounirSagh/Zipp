@@ -148,7 +148,6 @@ function CuisinePanel() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <div className="border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <h1 className="text-4xl font-light text-black mb-2">Kitchen</h1>
@@ -156,8 +155,6 @@ function CuisinePanel() {
             Ready to prepare delicious meals
           </p>
           <div className="flex items-center space-x-10 mt-6">
-            {" "}
-            {/* Adjusted spacing */}
             <div className="text-center">
               <div className="text-5xl font-extralight text-black">
                 {confirmedOrders.length}
@@ -184,21 +181,15 @@ function CuisinePanel() {
         </div>
       </div>
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {" "}
-        {/* Adjusted max-width and padding */}
         {confirmedOrders.length === 0 ? (
           <div className="text-center py-20">
-            {" "}
-            {/* Adjusted padding */}
             <ChefHat className="w-20 h-20 text-gray-200 mx-auto mb-8" />
             <h2 className="text-2xl font-light text-black mb-2">
               All caught up
-            </h2>{" "}
-            {/* Adjusted font */}
+            </h2>
             <p className="text-gray-600">
               New orders will appear here automatically
-            </p>{" "}
-            {/* Adjusted font */}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -213,7 +204,7 @@ function CuisinePanel() {
               return (
                 <Card
                   key={order.id}
-                  className={`relative overflow-hidden rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 ${urgencyBorderClass}`} // Added border and shadow classes from admin.tsx
+                  className={`relative overflow-hidden rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 ${urgencyBorderClass}`}
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
@@ -223,10 +214,10 @@ function CuisinePanel() {
                       <div
                         className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium ${
                           urgency === "critical"
-                            ? "bg-red-50 text-red-700 border-red-200" // Matched admin.tsx badge style
+                            ? "bg-red-50 text-red-700 border-red-200"
                             : urgency === "warning"
-                            ? "bg-yellow-50 text-yellow-700 border-yellow-200" // Matched admin.tsx badge style
-                            : "bg-gray-50 text-gray-700 border-gray-200" // Matched admin.tsx badge style
+                            ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                            : "bg-gray-50 text-gray-700 border-gray-200"
                         }`}
                       >
                         <Clock className="w-3 h-3" />
@@ -243,20 +234,14 @@ function CuisinePanel() {
                         >
                           <div className="font-medium text-black">
                             {item.name}
-                          </div>{" "}
-                          {/* Matched admin.tsx item font */}
-                          <div className="text-gray-600">
-                            x{item.quantity}
-                          </div>{" "}
-                          {/* Matched admin.tsx quantity font */}
+                          </div>
+                          <div className="text-gray-600">x{item.quantity}</div>
                         </div>
                       ))}
                     </div>
                     {order.specialInstructions && (
                       <div className="mt-4 pt-4 border-t border-gray-100">
                         <div className="bg-gray-100 border border-gray-200 rounded-xl p-4">
-                          {" "}
-                          {/* Matched admin.tsx instructions style */}
                           <p className="text-gray-800 text-sm">
                             <span className="font-medium">Instructions:</span>{" "}
                             {order.specialInstructions}
@@ -268,7 +253,7 @@ function CuisinePanel() {
                   <CardFooter className="pt-0">
                     <Button
                       onClick={() => handleReady(order.id, order.phoneNumber)}
-                      className="w-full bg-black text-white hover:bg-gray-800 rounded-full px-6 py-2 font-medium transition-colors" // Matched admin.tsx button style
+                      className="w-full bg-black text-white hover:bg-gray-800 rounded-full px-6 py-2 font-medium transition-colors"
                     >
                       Mark as Ready
                     </Button>

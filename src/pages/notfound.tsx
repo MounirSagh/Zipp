@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 function NotFound() {
   return (
     <div className="relative h-screen w-full bg-black overflow-hidden">
-      {/* Background animation layer */}
       <BackgroundBeams className="absolute inset-0 z-0" />
       <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
         <motion.h1
@@ -32,7 +31,6 @@ function NotFound() {
           Oops! The page you're looking for doesn’t exist or has been moved. But
           don’t worry — we’ll help you find your way back.
         </motion.p>
-        
       </div>
     </div>
   );

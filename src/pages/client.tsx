@@ -1,4 +1,3 @@
-// src/pages/RestaurantPage.tsx
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -20,7 +19,6 @@ function fromCode(code: string) {
   return atob(padded);
 }
 
-/** --- Types --- */
 type MenuItem = {
   id: number;
   name: string;
@@ -56,7 +54,6 @@ export default function RestaurantPage() {
   }>();
   const { t } = useTranslation();
 
-  // Get table number from URL parameters
   const tableNumber = table;
   const [menu, setMenu] = useState<MenuCategory[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -227,7 +224,6 @@ export default function RestaurantPage() {
     }
   };
 
-  /** --- Render --- */
   if (loading)
     return (
       <div className="min-h-screen bg-neutral-900 flex items-center justify-center">
@@ -292,7 +288,6 @@ export default function RestaurantPage() {
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white">
-      {/* Header */}
       <div className="backdrop-blur-lg border-b border-neutral-800 sticky top-0 z-40 shadow-xl">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -424,7 +419,6 @@ export default function RestaurantPage() {
         </div>
       </div>
 
-      {/* Menu */}
       <div className="container mx-auto px-4 py-6">
         {menu &&
           menu.map((category) => (
@@ -447,7 +441,6 @@ export default function RestaurantPage() {
                     onClick={() => openItemModal(item)}
                     className="bg-neutral-900 border border-yellow-300/20 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-neutral-750 transition-all duration-200 touch-manipulation active:scale-98"
                   >
-                    {/* Item Image */}
                     <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
                       {item.imageUrl ? (
                         <img
@@ -462,7 +455,6 @@ export default function RestaurantPage() {
                       )}
                     </div>
 
-                    {/* Item Details */}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-white text-base sm:text-lg mb-1 truncate">
                         {item.name}
@@ -509,7 +501,6 @@ export default function RestaurantPage() {
           ))}
       </div>
 
-      {/* Item Detail Modal */}
       <Dialog open={selectedItem !== null} onOpenChange={closeItemModal}>
         <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] bg-neutral-800 border-yellow-300/20 text-white rounded-2xl shadow-2xl flex flex-col">
           {selectedItem && (
@@ -522,7 +513,6 @@ export default function RestaurantPage() {
 
               <div className="flex-1 overflow-y-auto min-h-0">
                 <div className="space-y-4 p-1">
-                  {/* Item Image */}
                   {selectedItem.imageUrl && (
                     <div className="w-full h-48 rounded-xl overflow-hidden">
                       <img
@@ -533,7 +523,6 @@ export default function RestaurantPage() {
                     </div>
                   )}
 
-                  {/* Item Info */}
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2">
                       {selectedItem.name}
@@ -558,7 +547,6 @@ export default function RestaurantPage() {
                     </div>
                   </div>
 
-                  {/* Quantity Selector */}
                   <div className="flex items-center gap-4">
                     <span className="text-white font-medium">
                       {t("menu.quantity")}:
@@ -590,7 +578,6 @@ export default function RestaurantPage() {
                 </div>
               </div>
 
-              {/* Add to Cart Button */}
               <div className="flex gap-3 pt-4 border-t border-yellow-300/20 flex-shrink-0">
                 <Button
                   variant="outline"
@@ -623,7 +610,6 @@ export default function RestaurantPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Checkout Dialog */}
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
         <DialogContent className="w-[95vw] max-w-md max-h-[90vh] bg-neutral-800 border-yellow-300/20 text-white rounded-2xl shadow-2xl flex flex-col">
           <DialogHeader className="pb-4 border-b border-yellow-300/20 flex-shrink-0">

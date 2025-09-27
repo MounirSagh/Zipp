@@ -84,12 +84,6 @@ function Admin() {
     fetchOrders();
   };
 
-  // const handleReady = async (orderId: number, phone: string) => {
-  //   await updateOrderStatus(orderId, "ready")
-  //   await sendSMS(phone, `Your order #${orderId} is ready for pickup! 🍽️`)
-  //   fetchOrders()
-  // }
-
   const handleReject = async (orderId: number, phone: string) => {
     await updateOrderStatus(orderId, "Rejected");
     await sendSMS(
@@ -155,7 +149,6 @@ function Admin() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <div className="border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <h1 className="text-4xl font-light text-black mb-2">Orders</h1>
@@ -285,7 +278,6 @@ function Admin() {
                       <TableRow className="border-b border-gray-50">
                         <TableCell colSpan={5} className="py-0">
                           <div className="bg-gray-50/30 px-6 py-8 space-y-8">
-                            {/* Items */}
                             <div>
                               <h4 className="text-lg font-medium text-black mb-4">
                                 Items
@@ -316,7 +308,7 @@ function Admin() {
                                 )}
                               </div>
                             </div>
-                            {/* Special Instructions */}
+
                             {order.specialInstructions && (
                               <div>
                                 <h4 className="text-lg font-medium text-black mb-3">
@@ -329,7 +321,6 @@ function Admin() {
                                 </div>
                               </div>
                             )}
-                            {/* Actions */}
                             <div className="flex space-x-3 pt-4">
                               <Button
                                 onClick={() =>

@@ -13,7 +13,6 @@ export default function Home() {
 
   return (
     <div className="relative h-screen w-full bg-black overflow-hidden">
-      {/* Background animation layer */}
       <BackgroundBeams className="absolute inset-0 z-0" />
 
       <motion.div
@@ -25,7 +24,6 @@ export default function Home() {
         <Zap className="text-white" size={40} />
         Zipp<span className="text-white">.</span>
       </motion.div>
-      {/* Foreground content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -51,12 +49,9 @@ export default function Home() {
               </Button>
             </DialogTrigger>
             <DialogContent className="border-none bg-transparent p-6 rounded-2xl shadow-xl flex justify-center items-center">
-              <SignIn
-                afterSignInUrl="/dashboard"
-              />
+              <SignIn afterSignInUrl="/dashboard" />
             </DialogContent>
           </Dialog>
-          
         </motion.div>
       </div>
     </div>

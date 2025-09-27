@@ -21,7 +21,6 @@ import { Button } from "./ui/button";
 import { ChefHat, ClipboardList, LayoutDashboard } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 
-// Navigation items
 const mainNavItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/orders", label: "Orders", icon: ClipboardList },
@@ -29,7 +28,6 @@ const mainNavItems = [
   { path: "/cuisine", label: "Cuisine", icon: ChefHat },
 ];
 
-// Navigation item component
 function SidebarNavItem({
   path,
   label,
