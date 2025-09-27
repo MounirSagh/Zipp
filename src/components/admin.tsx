@@ -35,8 +35,6 @@ function Admin() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hasNotificationPermission, setHasNotificationPermission] =
     useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [isPolling, setIsPolling] = useState(false);
   const [newOrderIds, setNewOrderIds] = useState<Set<number>>(new Set());
   const { isSignedIn, user } = useUser();
 
@@ -47,9 +45,7 @@ function Admin() {
 
   const fetchOrders = async (showNotification = false) => {
     try {
-      if (showNotification) {
-        setIsPolling(true);
-      } else {
+      if (!showNotification) {
         setLoading(true);
       }
 
@@ -135,7 +131,6 @@ function Admin() {
       }
 
       setOrders(data);
-      setLastUpdated(new Date());
     } catch (err: any) {
       console.error("Error fetching orders:", err);
       // Don't show alert during automatic polling, only during manual refresh
@@ -144,7 +139,6 @@ function Admin() {
       }
     } finally {
       setLoading(false);
-      setIsPolling(false);
     }
   };
 
