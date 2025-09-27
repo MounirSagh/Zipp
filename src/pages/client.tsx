@@ -426,12 +426,12 @@ export default function RestaurantPage() {
             .sort((a, b) => (a.order || 0) - (b.order || 0))
             .map((category) => (
               <section key={category.id} className="mb-8">
-                <div className="flex text-center items-center justify-center bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg">
+                <div className="flex text-center items-center justify-center gap-2 bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg">
                   <h2 className="text-xl sm:text-2xl font-bold text-yellow-300 mb-2">
                     {category.name}
                   </h2>
                   {category.description && (
-                    <p className="text-neutral-400 text-sm sm:text-base mb-4">
+                    <p className="text-neutral-400 text-sm sm:text-base">
                       {category.description}
                     </p>
                   )}
