@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -18,8 +18,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Volume2, VolumeX } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
+import {
+  NotificationSound,
+  requestNotificationPermission,
+  showBrowserNotification,
+} from "@/utils/notifications";
 
 function Admin() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -27,11 +32,27 @@ function Admin() {
   const [rejectingOrderId, setRejectingOrderId] = useState<number | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [loading, setLoading] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [hasNotificationPermission, setHasNotificationPermission] =
+    useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
+  const [newOrderIds, setNewOrderIds] = useState<Set<number>>(new Set());
   const { isSignedIn, user } = useUser();
 
-  const fetchOrders = async () => {
+  // Refs for notification functionality
+  const notificationSound = useRef<NotificationSound | null>(null);
+  const previousOrdersRef: any = useRef<Set<number>>(new Set());
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const fetchOrders = async (showNotification = false) => {
     try {
-      setLoading(true);
+      if (showNotification) {
+        setIsPolling(true);
+      } else {
+        setLoading(true);
+      }
+
       const response = await fetch(
         `https://zipp-backend.vercel.app/api/orders/${user?.id}`,
         {
@@ -42,11 +63,88 @@ function Admin() {
         }
       );
       const data = await response.json();
+
+      // Check for new orders if this is not the initial load
+      if (showNotification && data.length > 0) {
+        const currentOrderIds = new Set(
+          data.map((order: any) => Number(order.id))
+        );
+        const previousOrderIds = previousOrdersRef.current;
+
+        // Find new orders by comparing with previous order IDs
+        const newOrders = data.filter(
+          (order: any) =>
+            !previousOrderIds.has(Number(order.id)) &&
+            order.status.toLowerCase() === "pending"
+        );
+
+        if (newOrders.length > 0) {
+          console.log(
+            `🔔 ${newOrders.length} new order(s) detected!`,
+            newOrders
+          );
+
+          // Highlight new orders for 10 seconds
+          const newOrdersSet = new Set<number>(
+            newOrders.map((order: any) => Number(order.id))
+          );
+          setNewOrderIds(newOrdersSet);
+
+          // Clear highlights after 10 seconds
+          setTimeout(() => {
+            setNewOrderIds(new Set());
+          }, 30000);
+
+          // Play notification sound immediately
+          if (soundEnabled && notificationSound.current) {
+            try {
+              notificationSound.current.playNotificationSound();
+              console.log("🔊 Notification sound played");
+            } catch (error) {
+              console.error("Failed to play notification sound:", error);
+            }
+          }
+
+          // Show browser notification
+          if (hasNotificationPermission) {
+            const orderText =
+              newOrders.length === 1
+                ? `New order #${newOrders[0].id} from ${newOrders[0].firstName} ${newOrders[0].lastName} - $${newOrders[0].totalAmount}`
+                : `${newOrders.length} new orders received`;
+
+            try {
+              showBrowserNotification("🍽️ New Order Alert!", orderText, {
+                requireInteraction: false,
+                silent: false,
+                icon: "/zap.svg",
+              });
+              console.log("📢 Browser notification sent");
+            } catch (error) {
+              console.error("Failed to show browser notification:", error);
+            }
+          }
+        }
+
+        // Update the previous orders reference
+        previousOrdersRef.current = currentOrderIds;
+      } else if (!showNotification) {
+        // Initial load - just set the previous orders without notification
+        previousOrdersRef.current = new Set(
+          data.map((order: any) => Number(order.id))
+        );
+      }
+
       setOrders(data);
+      setLastUpdated(new Date());
     } catch (err: any) {
-      alert("Error fetching orders: " + err.message);
+      console.error("Error fetching orders:", err);
+      // Don't show alert during automatic polling, only during manual refresh
+      if (!showNotification) {
+        alert("Error fetching orders: " + err.message);
+      }
     } finally {
       setLoading(false);
+      setIsPolling(false);
     }
   };
 
@@ -115,9 +213,43 @@ function Admin() {
     }
   };
 
+  // Initialize notification system
+  useEffect(() => {
+    // Initialize notification sound
+    notificationSound.current = new NotificationSound();
+
+    // Request browser notification permission
+    const setupNotifications = async () => {
+      const hasPermission = await requestNotificationPermission();
+      setHasNotificationPermission(hasPermission);
+    };
+
+    setupNotifications();
+
+    // Cleanup on unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, []);
+
+  // Handle orders fetching and polling
   useEffect(() => {
     if (isSignedIn && user?.id) {
-      fetchOrders();
+      // Initial fetch
+      fetchOrders(false);
+
+      // Set up polling for new orders every 10 seconds for faster response
+      pollingIntervalRef.current = setInterval(() => {
+        fetchOrders(true);
+      }, 30000); // 10 seconds - more responsive
+
+      return () => {
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+        }
+      };
     }
   }, [isSignedIn, user]);
 
@@ -136,7 +268,7 @@ function Admin() {
     );
   }
 
-  if (loading) {
+  if (loading && orders.length === 0) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
@@ -151,8 +283,83 @@ function Admin() {
     <div className="min-h-screen bg-white">
       <div className="border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-12">
-          <h1 className="text-4xl font-light text-black mb-2">Orders</h1>
-          <p className="text-gray-600 text-lg">Manage your restaurant orders</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-light text-black mb-2">Orders</h1>
+              <p className="text-gray-600 text-lg">
+                Manage your restaurant orders
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchOrders(true)}
+                className="flex items-center space-x-2 hover:bg-blue-50 border-blue-200 text-blue-700"
+                disabled={loading}
+              >
+                <span>🔄</span>
+                <span>Refresh</span>
+              </Button>
+              <div className="flex items-center space-x-2">
+                {/* <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (soundEnabled && notificationSound.current) {
+                      notificationSound.current.playNotificationSound();
+                    }
+                  }}
+                  className="flex items-center space-x-1 hover:bg-blue-50 border-blue-200 text-blue-700 text-xs px-2 py-1"
+                  disabled={!soundEnabled}
+                >
+                  🔊 Test
+                </Button> */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className={`flex items-center space-x-2 ${
+                    soundEnabled
+                      ? "bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                      : "bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100"
+                  }`}
+                >
+                  {soundEnabled ? (
+                    <Volume2 className="w-4 h-4" />
+                  ) : (
+                    <VolumeX className="w-4 h-4" />
+                  )}
+                  <span>{soundEnabled ? "Sound On" : "Sound Off"}</span>
+                </Button>
+              </div>
+              {/* <div className="text-right">
+                <div className="text-sm text-gray-500 flex items-center space-x-2">
+                  <span>
+                    {hasNotificationPermission
+                      ? "🔔 Notifications enabled"
+                      : "🔕 Enable notifications"}
+                  </span>
+                  {isPolling && (
+                    <span className="inline-flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
+                      <span className="text-xs text-green-600">
+                        Checking...
+                      </span>
+                    </span>
+                  )}
+                </div>
+                {lastUpdated && (
+                  <div className="text-xs text-gray-400">
+                    Last updated: {lastUpdated.toLocaleTimeString()}
+                  </div>
+                )}
+                <div className="text-xs text-blue-600 mt-1">
+                  🔄 Auto-refresh every 10s
+                </div>
+              </div> */}
+            </div>
+          </div>
         </div>
       </div>
       <div className="max-w-6xl mx-auto px-6 py-12">
@@ -198,17 +405,28 @@ function Admin() {
                 {orders.map((order, index) => (
                   <React.Fragment key={order.id}>
                     <TableRow
-                      className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${
+                      className={`border-b border-gray-50 hover:bg-gray-50 transition-all duration-500 ${
                         index === orders.length - 1 &&
                         expandedOrderId !== order.id
                           ? "border-b-0"
                           : ""
+                      } ${
+                        newOrderIds.has(Number(order.id))
+                          ? "bg-gradient-to-r from-green-50 to-blue-50 border-green-200 shadow-md animate-pulse"
+                          : ""
                       }`}
                     >
                       <TableCell className="py-4 px-6">
-                        <span className="text-gray-800 font-semibold">
-                          {order.firstName} {order.lastName}
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-gray-800 font-semibold">
+                            {order.firstName} {order.lastName}
+                          </span>
+                          {newOrderIds.has(Number(order.id)) && (
+                            <Badge className="bg-green-500 text-white text-xs px-2 py-1 animate-bounce">
+                              NEW!
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="py-4 px-6">
                         <span className="text-gray-800 font-semibold">
@@ -229,7 +447,7 @@ function Admin() {
                       </TableCell>
                       <TableCell className="py-4">
                         <span className="text-gray-800 font-semibold">
-                          {order.totalAmount} $
+                          {order.totalAmount} MAD
                         </span>
                       </TableCell>
                       <TableCell className="py-4">
@@ -293,14 +511,14 @@ function Admin() {
                                         {item.name}
                                       </span>
                                       <div className="flex items-center space-x-4 text-gray-500">
-                                        <span>{item.price} $</span>
+                                        <span>{item.price} MAD</span>
                                         <span>×</span>
                                         <span>{item.quantity}</span>
                                         <span className="text-gray-800 font-semibold min-w-[80px] text-right">
                                           {(item.price * item.quantity).toFixed(
                                             2
                                           )}{" "}
-                                          $
+                                          MAD
                                         </span>
                                       </div>
                                     </div>
