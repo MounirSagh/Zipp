@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ShoppingCartIcon, Trash } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 
@@ -107,6 +108,7 @@ export default function RestaurantPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>("");
 
   useEffect(() => {
     async function fetchMenu() {
@@ -124,6 +126,13 @@ export default function RestaurantPage() {
         if (!json.success)
           throw new Error(json.error || "Failed to fetch menu");
         setMenu(json.data);
+        // Set the first category as default selected
+        if (json.data.length > 0) {
+          const sortedCategories = json.data.sort(
+            (a, b) => (a.order || 0) - (b.order || 0)
+          );
+          setSelectedCategoryTab(sortedCategories[0].id.toString());
+        }
         setMenuReady(true); // Menu is ready, but loading screen will continue for 3 seconds
       } catch (err: any) {
         console.error(err);
@@ -149,7 +158,11 @@ export default function RestaurantPage() {
     });
   };
 
-  const addToCartWithQuantity = (item: MenuItem, quantity: number, categoryName: string) => {
+  const addToCartWithQuantity = (
+    item: MenuItem,
+    quantity: number,
+    categoryName: string
+  ) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
       if (existingItem) {
@@ -480,95 +493,149 @@ export default function RestaurantPage() {
       </div>
 
       <div className="container mx-auto px-4 py-6 relative z-10">
-        {menu &&
-          menu
-            .sort((a, b) => (a.order || 0) - (b.order || 0))
-            .map((category) => (
-              <section key={category.id} className="mb-8 relative">
-                <div className="relative flex text-center items-center justify-center gap-2 bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg overflow-hidden">
-                  {/* Category decorative lines */}
-                  <div className="absolute left-0 top-1/2 w-8 h-px bg-gradient-to-r from-yellow-300/60 to-transparent"></div>
-                  <div className="absolute right-0 top-1/2 w-8 h-px bg-gradient-to-l from-yellow-300/60 to-transparent"></div>
-                  <div className="absolute left-2 top-1/2 w-1 h-1 bg-yellow-300/40 rotate-45"></div>
-                  <div className="absolute right-2 top-1/2 w-1 h-1 bg-yellow-300/40 rotate-45"></div>
-
-                  <h2 className="text-xl sm:text-2xl font-bold text-yellow-300 mb-2">
-                    {category.name}
+        {menu && menu.length > 0 && (
+          <Tabs
+            value={selectedCategoryTab}
+            onValueChange={setSelectedCategoryTab}
+            className="w-full"
+          >
+            {/* Menu Categories Section */}
+            <div className="sticky top-[73px] z-30 bg-gradient-to-b from-neutral-900 via-neutral-900/98 to-neutral-900/95 backdrop-blur-xl border-b border-yellow-300/20 pb-6 mb-8 -mx-4 px-4 shadow-lg">
+              {/* Title Section */}
+              <div className="text-center mb-6 pt-2">
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <div className="w-8 h-px bg-gradient-to-r from-transparent to-yellow-300/60"></div>
+                  <h2 className="text-4xl font-bold text-yellow-300 font-qwigley">
+                    {t("menu.ourMenu") || "Our Menu"}
                   </h2>
-                  {category.description && (
-                    <p className="text-neutral-400 text-sm sm:text-base">
-                      {category.description}
-                    </p>
-                  )}
+                  <div className="w-8 h-px bg-gradient-to-l from-transparent to-yellow-300/60"></div>
                 </div>
+                <p className="text-neutral-400 text-sm sm:text-base font-medium">
+                  {t("menu.selectCategory") ||
+                    "Select a category to explore our delicious dishes"}
+                </p>
+              </div>
 
-                <div className="space-y-4">
-                  {category.items.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => openItemModal(item, category.name)}
-                      className="bg-neutral-900 border border-yellow-300/20 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-neutral-750 transition-all duration-200 touch-manipulation active:scale-98 relative overflow-hidden group"
-                    >
-                      {/* Subtle hover accent line */}
-                      <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-transparent via-yellow-300/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div
-                        className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-transparent via-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{ transitionDelay: "100ms" }}
-                      ></div>
-                      {item.imageUrl && (
-                        <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
-                          <img
-                            src={item.imageUrl}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
+              {/* Tabs Container */}
+              <div className="relative">
+                {/* Fade edges for scrollable area */}
+                <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-neutral-900 to-transparent z-10 pointer-events-none"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-neutral-900 to-transparent z-10 pointer-events-none"></div>
 
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-white text-base sm:text-lg mb-1 truncate">
-                          {item.name}
-                        </h3>
-                        {item.description && (
-                          <p className="text-neutral-400 text-sm line-clamp-2 mb-2">
-                            {item.description}
-                          </p>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <span className="text-white font-bold text-lg">
-                            MAD{parseFloat(item.price).toFixed(2)}
+                <div className="overflow-x-auto scrollbar-hide px-2">
+                  <TabsList className="inline-flex bg-transparent border-0 gap-3 p-0 h-auto min-w-full w-max">
+                    {menu
+                      .sort((a, b) => (a.order || 0) - (b.order || 0))
+                      .map((category, index) => (
+                        <TabsTrigger
+                          key={category.id}
+                          value={category.id.toString()}
+                          className="group relative data-[state=active]:bg-yellow-300 data-[state=active]:text-neutral-900 data-[state=active]:font-bold data-[state=active]:shadow-xl data-[state=active]:shadow-yellow-300/20 bg-neutral-800/80 text-white hover:text-yellow-300 hover:bg-neutral-700/90 hover:shadow-lg transition-all duration-300 px-8 py-4 rounded-full text-sm font-semibold whitespace-nowrap border border-yellow-300/30 data-[state=active]:border-yellow-300 data-[state=active]:scale-105 hover:scale-102 backdrop-blur-sm"
+                          style={{
+                            animationDelay: `${index * 100}ms`,
+                          }}
+                        >
+                          <span className="relative z-10">{category.name}</span>
+
+                        </TabsTrigger>
+                      ))}
+                  </TabsList>
+                </div>
+              </div>
+            </div>
+
+            {menu
+              .sort((a, b) => (a.order || 0) - (b.order || 0))
+              .map((category) => (
+                <TabsContent
+                  key={category.id}
+                  value={category.id.toString()}
+                  className="mt-0 animate-fadeInUp"
+                >
+                  <div className="space-y-5">
+                    {category.description && (
+                      <div className="text-center mb-8 p-4 bg-neutral-800/30 rounded-2xl border border-yellow-300/10 backdrop-blur-sm">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <div className="w-4 h-px bg-yellow-300/40"></div>
+                          <span className="text-yellow-300 text-xs font-semibold uppercase tracking-wider">
+                            {category.name}
                           </span>
-                          <div className="flex items-center gap-2">
-                            {!item.isAvailable && (
-                              <span className="text-red-400 text-xs font-medium">
-                                {t("menu.notAvailable")}
-                              </span>
-                            )}
-                            <div
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (item.isAvailable) {
-                                  addToCart(item, category.name);
-                                }
-                              }}
-                              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
-                                item.isAvailable
-                                  ? "bg-neutral-600 hover:bg-neutral-500 cursor-pointer active:scale-95"
-                                  : "bg-neutral-700 cursor-not-allowed opacity-50"
-                              }`}
-                            >
-                              <span className="text-white text-lg font-bold">
-                                +
-                              </span>
+                          <div className="w-4 h-px bg-yellow-300/40"></div>
+                        </div>
+                        <p className="text-neutral-300 text-sm sm:text-base font-medium leading-relaxed">
+                          {category.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {category.items.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => openItemModal(item, category.name)}
+                        className="bg-gradient-to-r from-neutral-900 via-neutral-900/95 to-neutral-800/90 border border-yellow-300/20 rounded-2xl p-5 flex items-center gap-4 cursor-pointer hover:border-yellow-300/40 hover:shadow-xl hover:shadow-yellow-300/5 transition-all duration-300 touch-manipulation active:scale-98 relative overflow-hidden group backdrop-blur-sm"
+                      >
+                        {/* Subtle hover accent line */}
+                        <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-transparent via-yellow-300/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div
+                          className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-transparent via-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          style={{ transitionDelay: "100ms" }}
+                        ></div>
+                        {item.imageUrl && (
+                          <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-white text-base sm:text-lg mb-1 truncate">
+                            {item.name}
+                          </h3>
+                          {item.description && (
+                            <p className="text-neutral-400 text-sm line-clamp-2 mb-2">
+                              {item.description}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between">
+                            <span className="text-white font-bold text-lg">
+                              MAD{parseFloat(item.price).toFixed(2)}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              {!item.isAvailable && (
+                                <span className="text-red-400 text-xs font-medium">
+                                  {t("menu.notAvailable")}
+                                </span>
+                              )}
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (item.isAvailable) {
+                                    addToCart(item, category.name);
+                                  }
+                                }}
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                                  item.isAvailable
+                                    ? "bg-neutral-600 hover:bg-neutral-500 cursor-pointer active:scale-95"
+                                    : "bg-neutral-700 cursor-not-allowed opacity-50"
+                                }`}
+                              >
+                                <span className="text-white text-lg font-bold">
+                                  +
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
+                    ))}
+                  </div>
+                </TabsContent>
+              ))}
+          </Tabs>
+        )}
       </div>
 
       <Dialog open={selectedItem !== null} onOpenChange={closeItemModal}>
@@ -664,7 +731,11 @@ export default function RestaurantPage() {
                   } font-semibold`}
                   onClick={() => {
                     if (selectedItem.isAvailable) {
-                      addToCartWithQuantity(selectedItem, itemQuantity, selectedCategory);
+                      addToCartWithQuantity(
+                        selectedItem,
+                        itemQuantity,
+                        selectedCategory
+                      );
                       closeItemModal();
                     }
                   }}

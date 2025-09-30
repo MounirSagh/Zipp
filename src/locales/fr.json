@@ -17,6 +17,8 @@
     "orderAgain": "Commander Encore"
   },
   "menu": {
+    "ourMenu": "Notre Menu",
+    "selectCategory": "Sélectionnez une catégorie pour explorer nos plats délicieux",
     "addToCart": "Ajouter au Panier",
     "notAvailable": "Non Disponible",
     "ingredients": "Ingrédients :",

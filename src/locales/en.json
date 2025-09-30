@@ -17,6 +17,8 @@
     "orderAgain": "Order Again"
   },
   "menu": {
+    "ourMenu": "Our Menu",
+    "selectCategory": "Select a category to explore our delicious dishes",
     "addToCart": "Add to Cart",
     "notAvailable": "Not Available",
     "ingredients": "Ingredients:",

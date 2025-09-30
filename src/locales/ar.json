@@ -17,6 +17,8 @@
     "orderAgain": "اطلب مرة أخرى"
   },
   "menu": {
+    "ourMenu": "قائمتنا",
+    "selectCategory": "اختر فئة لاستكشاف أطباقنا اللذيذة",
     "addToCart": "أضف للسلة",
     "notAvailable": "غير متوفر",
     "ingredients": "المكونات:",
