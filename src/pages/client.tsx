@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ShoppingCartIcon, Trash } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
+import Preloader from "@/components/Preloader";
+import { AnimatePresence } from "framer-motion";
 
 function fromCode(code: string) {
   const b64 = code.replace(/-/g, "+").replace(/_/g, "/");
@@ -62,41 +64,8 @@ export default function RestaurantPage() {
   const [menu, setMenu] = useState<MenuCategory[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [menuReady, setMenuReady] = useState(false);
-
-  // Multi-language hello animation
-  const hellos = [
-    "Hello", // English
-    "Hola", // Spanish
-    "Bonjour", // French
-    "مرحبا", // Arabic
-    "مرحبا", // Arabic
-  ];
-  const [currentHelloIndex, setCurrentHelloIndex] = useState(0);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // Cycle through hello messages while loading
-  useEffect(() => {
-    if (loading) {
-      const interval = setInterval(() => {
-        setCurrentHelloIndex((prevIndex) => (prevIndex + 1) % hellos.length);
-      }, 800); // Change every 800ms
-
-      return () => clearInterval(interval);
-    }
-  }, [loading, hellos.length]);
-
-  // Ensure loading screen shows for at least 3 seconds
-  useEffect(() => {
-    if (menuReady) {
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 3000); // Show loading for minimum 3 seconds
-
-      return () => clearTimeout(timer);
-    }
-  }, [menuReady]);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -133,7 +102,7 @@ export default function RestaurantPage() {
           );
           setSelectedCategoryTab(sortedCategories[0].id.toString());
         }
-        setMenuReady(true); // Menu is ready, but loading screen will continue for 3 seconds
+        // The preloader will handle its own timing, so we don't set loading to false here
       } catch (err: any) {
         console.error(err);
         setError(err.message || "Network error while fetching menu");
@@ -279,7 +248,15 @@ export default function RestaurantPage() {
     }
   };
 
-  if (loading)
+  if (loading && menu) {
+    return (
+      <AnimatePresence mode="wait">
+        <Preloader key="preloader" onComplete={() => setLoading(false)} />
+      </AnimatePresence>
+    );
+  }
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-neutral-900 flex items-center justify-center relative overflow-hidden">
         {/* Background decorative elements for loading */}
@@ -291,26 +268,12 @@ export default function RestaurantPage() {
         </div>
 
         <div className="text-center z-10">
-          <div className="text-7xl font-bold text-yellow-300 mb-2 min-h-[3rem] flex items-center justify-center transition-all duration-300 font-qwigley">
-            <span className="animate-pulse">{hellos[currentHelloIndex]}</span>
-          </div>
-          {/* 
-          <div className="text-sm text-neutral-400 font-medium">
-            {t("loading")}...
-          </div> */}
+          <div className="text-7xl font-bold text-yellow-300 mb-2 min-h-[3rem] flex items-center justify-center transition-all duration-300 font-qwigley"></div>
         </div>
-        <div className="absolute bottom-20">
-            <div className="flex items-center gap-1">
-              <h1 className="text-4xl font-bold text-white font-qwigley">
-                ZIPP
-              </h1>
-              <h1 className="text-3xl font-bold text-yellow-300 font-qwigley mt-4">
-                Dine
-              </h1>
-            </div>
-        </div>
+        <div className="absolute bottom-20"></div>
       </div>
     );
+  }
 
   if (error)
     return (
@@ -546,7 +509,6 @@ export default function RestaurantPage() {
                           }}
                         >
                           <span className="relative z-10">{category.name}</span>
-
                         </TabsTrigger>
                       ))}
                   </TabsList>
