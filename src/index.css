@@ -124,9 +124,9 @@
   text-align: right;
 }
 
-[dir="rtl"] .flex {
+/* [dir="rtl"] .flex {
   flex-direction: row-reverse;
-}
+} */
 
 [dir="rtl"] .grid {
   direction: rtl;
@@ -136,6 +136,49 @@
 [dir="rtl"] .price,
 [dir="rtl"] .badge,
 [dir="rtl"] .cart-button {
+  direction: ltr;
+}
+
+/* Cart and checkout RTL fixes */
+[dir="rtl"] .cart-item {
+  direction: rtl;
+}
+
+[dir="rtl"] .cart-item .quantity-controls {
+  direction: ltr;
+}
+
+[dir="rtl"] .cart-total {
+  direction: rtl;
+}
+
+/* Specific RTL adjustments for cart items */
+[dir="rtl"] .cart-item-details {
+  text-align: right;
+}
+
+[dir="rtl"] .cart-item-price {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Fix margin issues in RTL */
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+/* Button groups in RTL */
+[dir="rtl"] .quantity-controls .gap-1 {
+  direction: ltr;
+}
+
+[dir="rtl"] .quantity-controls button {
   direction: ltr;
 }
 

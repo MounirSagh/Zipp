@@ -63,7 +63,7 @@ export default function LanguageSelector() {
           variant="outline"
           className="bg-neutral-800 border-yellow-300/20 text-white hover:bg-neutral-700 transition-all duration-200 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm min-h-[40px] shadow-lg"
         >
-          <Languages className="w-8 h-8"/>
+          <Languages className="w-8 h-8" />
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-sm bg-neutral-900 border-yellow-500/30 text-white rounded-2xl shadow-2xl backdrop-blur-lg">
@@ -84,7 +84,9 @@ export default function LanguageSelector() {
               }`}
               variant="ghost"
             >
-              <span className="text-2xl mr-3">{language.flag}</span>
+              <span className="text-2xl rtl:ml-3 ltr:mr-3">
+                {language.flag}
+              </span>
               <span className="flex-1">{language.name}</span>
               {currentLanguage.code === language.code && (
                 <span className="text-yellow-200 text-sm">✓</span>

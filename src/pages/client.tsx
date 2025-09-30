@@ -39,6 +39,7 @@ type MenuCategory = {
 
 type CartItem = MenuItem & {
   quantity: number;
+  categoryName: string;
 };
 
 type CustomerInfo = {
@@ -60,10 +61,44 @@ export default function RestaurantPage() {
   const [menu, setMenu] = useState<MenuCategory[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [menuReady, setMenuReady] = useState(false);
+
+  // Multi-language hello animation
+  const hellos = [
+    "Hello", // English
+    "Hola", // Spanish
+    "Bonjour", // French
+    "مرحبا", // Arabic
+    "مرحبا", // Arabic
+  ];
+  const [currentHelloIndex, setCurrentHelloIndex] = useState(0);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Cycle through hello messages while loading
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setCurrentHelloIndex((prevIndex) => (prevIndex + 1) % hellos.length);
+      }, 800); // Change every 800ms
+
+      return () => clearInterval(interval);
+    }
+  }, [loading, hellos.length]);
+
+  // Ensure loading screen shows for at least 3 seconds
+  useEffect(() => {
+    if (menuReady) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 3000); // Show loading for minimum 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [menuReady]);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [itemQuantity, setItemQuantity] = useState(1);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     specialInstructions: "",
@@ -89,17 +124,17 @@ export default function RestaurantPage() {
         if (!json.success)
           throw new Error(json.error || "Failed to fetch menu");
         setMenu(json.data);
+        setMenuReady(true); // Menu is ready, but loading screen will continue for 3 seconds
       } catch (err: any) {
         console.error(err);
         setError(err.message || "Network error while fetching menu");
-      } finally {
-        setLoading(false);
+        setLoading(false); // On error, stop loading immediately
       }
     }
     if (code) fetchMenu();
   }, [code]);
 
-  const addToCart = (item: MenuItem) => {
+  const addToCart = (item: MenuItem, categoryName: string) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
       if (existingItem) {
@@ -109,12 +144,12 @@ export default function RestaurantPage() {
             : cartItem
         );
       } else {
-        return [...prevCart, { ...item, quantity: 1 }];
+        return [...prevCart, { ...item, quantity: 1, categoryName }];
       }
     });
   };
 
-  const addToCartWithQuantity = (item: MenuItem, quantity: number) => {
+  const addToCartWithQuantity = (item: MenuItem, quantity: number, categoryName: string) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
       if (existingItem) {
@@ -124,18 +159,20 @@ export default function RestaurantPage() {
             : cartItem
         );
       } else {
-        return [...prevCart, { ...item, quantity }];
+        return [...prevCart, { ...item, quantity, categoryName }];
       }
     });
   };
 
-  const openItemModal = (item: MenuItem) => {
+  const openItemModal = (item: MenuItem, categoryName: string) => {
     setSelectedItem(item);
+    setSelectedCategory(categoryName);
     setItemQuantity(1);
   };
 
   const closeItemModal = () => {
     setSelectedItem(null);
+    setSelectedCategory("");
     setItemQuantity(1);
   };
 
@@ -180,6 +217,7 @@ export default function RestaurantPage() {
         name: item.name,
         price: parseFloat(item.price),
         quantity: item.quantity,
+        category: item.categoryName,
       }));
 
       const orderData = {
@@ -230,10 +268,23 @@ export default function RestaurantPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-neutral-900 flex items-center justify-center">
-        <div className="text-lg sm:text-xl text-white animate-pulse flex items-center gap-3 font-medium">
-          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          {t("loading")}
+      <div className="min-h-screen bg-neutral-900 flex items-center justify-center relative overflow-hidden">
+        {/* Background decorative elements for loading */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-yellow-300/20"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 border-r-2 border-t-2 border-yellow-300/20"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 border-l-2 border-b-2 border-yellow-300/20"></div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-yellow-300/20"></div>
+        </div>
+
+        <div className="text-center z-10">
+          <div className="text-7xl font-bold text-yellow-300 mb-2 min-h-[3rem] flex items-center justify-center transition-all duration-300 font-qwigley">
+            <span className="animate-pulse">{hellos[currentHelloIndex]}</span>
+          </div>
+          {/* 
+          <div className="text-sm text-neutral-400 font-medium">
+            {t("loading")}...
+          </div> */}
         </div>
       </div>
     );
@@ -291,13 +342,25 @@ export default function RestaurantPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white">
+    <div className="min-h-screen bg-neutral-900 text-white relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Corner accent elements */}
+        <div className="absolute top-0 left-0 w-40 h-40 border-l-2 border-yellow-300/40 "></div>
+        <div className="absolute top-0 right-0 w-40 h-40 border-r-2 border-yellow-300/40 "></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 border-l-2  border-yellow-300/40 "></div>
+        <div className="absolute bottom-0 right-0 w-40 h-40 border-r-2  border-yellow-300/40"></div>
+      </div>
+
       <div className="backdrop-blur-lg border-b border-neutral-800 sticky top-0 z-40 shadow-xl">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold text-white  font-qwigley">
+            <div className="flex items-center gap-1">
+              <h1 className="text-3xl font-bold text-white font-qwigley">
                 ZIPP
+              </h1>
+              <h1 className="text-2xl font-bold text-yellow-300 font-qwigley mt-4">
+                Dine
               </h1>
             </div>
           </div>
@@ -314,7 +377,7 @@ export default function RestaurantPage() {
                     {t("cart.title")}
                   </span>
                   {getTotalItems() > 0 && (
-                    <Badge className="absolute -top-1 -right-1 min-w-[18px] h-4 text-xs bg-red-500 text-white border-0 font-bold">
+                    <Badge className="badge absolute -top-1 rtl:-left-1 ltr:-right-1 min-w-[18px] h-4 text-xs bg-red-500 text-white border-0 font-bold">
                       {getTotalItems()}
                     </Badge>
                   )}
@@ -340,22 +403,18 @@ export default function RestaurantPage() {
                       {cart.map((item) => (
                         <div
                           key={item.id}
-                          className="flex items-center justify-between p-3 border-b border-yellow-300/20 rounded-lg"
-                          dir="ltr"
+                          className="cart-item flex items-center justify-between p-3 border-b border-yellow-300/20 rounded-lg"
                         >
-                          <div className="flex-1 min-w-0 rtl:text-right ltr:text-left">
+                          <div className="cart-item-details flex-1 min-w-0">
                             <h4 className="font-semibold text-white text-sm truncate">
-                              {item.name}
+                              {item.categoryName}: {item.name}
                             </h4>
-                            <p className="text-xs text-neutral-400">
+                            <p className="cart-item-price text-xs text-neutral-400">
                               MAD{parseFloat(item.price).toFixed(2)}{" "}
                               {t("cart.each")}
                             </p>
                           </div>
-                          <div
-                            className="flex items-center gap-1 rtl:mr-2 ltr:ml-2"
-                            dir="ltr"
-                          >
+                          <div className="quantity-controls flex items-center gap-1 rtl:mr-2 ltr:ml-2">
                             <Button
                               size="sm"
                               variant="outline"
@@ -382,7 +441,7 @@ export default function RestaurantPage() {
                             <Button
                               size="sm"
                               variant="destructive"
-                              className="bg-red-600 hover:bg-red-700 w-8 h-8 min-h-[32px] text-sm ml-1"
+                              className="bg-red-600 hover:bg-red-700 w-8 h-8 min-h-[32px] text-sm rtl:mr-1 ltr:ml-1"
                               onClick={() => removeFromCart(item.id)}
                             >
                               <Trash />
@@ -396,12 +455,9 @@ export default function RestaurantPage() {
 
                 {cart.length > 0 && (
                   <div className="border-t border-neutral-700 pt-3 mt-3 flex-shrink-0">
-                    <div
-                      className="flex justify-between items-center text-lg font-bold mb-3"
-                      dir="ltr"
-                    >
+                    <div className="cart-total flex justify-between items-center text-lg font-bold mb-3">
                       <span className="text-white">{t("cart.total")}</span>
-                      <span className="text-white">
+                      <span className="text-white price">
                         MAD{getTotalPrice().toFixed(2)}
                       </span>
                     </div>
@@ -423,13 +479,19 @@ export default function RestaurantPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 relative z-10">
         {menu &&
           menu
             .sort((a, b) => (a.order || 0) - (b.order || 0))
             .map((category) => (
-              <section key={category.id} className="mb-8">
-                <div className="flex text-center items-center justify-center gap-2 bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg">
+              <section key={category.id} className="mb-8 relative">
+                <div className="relative flex text-center items-center justify-center gap-2 bg-neutral-900 border-b border-yellow-300/50 mb-6 rounded-lg overflow-hidden">
+                  {/* Category decorative lines */}
+                  <div className="absolute left-0 top-1/2 w-8 h-px bg-gradient-to-r from-yellow-300/60 to-transparent"></div>
+                  <div className="absolute right-0 top-1/2 w-8 h-px bg-gradient-to-l from-yellow-300/60 to-transparent"></div>
+                  <div className="absolute left-2 top-1/2 w-1 h-1 bg-yellow-300/40 rotate-45"></div>
+                  <div className="absolute right-2 top-1/2 w-1 h-1 bg-yellow-300/40 rotate-45"></div>
+
                   <h2 className="text-xl sm:text-2xl font-bold text-yellow-300 mb-2">
                     {category.name}
                   </h2>
@@ -444,9 +506,15 @@ export default function RestaurantPage() {
                   {category.items.map((item) => (
                     <div
                       key={item.id}
-                      onClick={() => openItemModal(item)}
-                      className="bg-neutral-900 border border-yellow-300/20 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-neutral-750 transition-all duration-200 touch-manipulation active:scale-98"
+                      onClick={() => openItemModal(item, category.name)}
+                      className="bg-neutral-900 border border-yellow-300/20 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-neutral-750 transition-all duration-200 touch-manipulation active:scale-98 relative overflow-hidden group"
                     >
+                      {/* Subtle hover accent line */}
+                      <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-transparent via-yellow-300/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div
+                        className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-transparent via-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ transitionDelay: "100ms" }}
+                      ></div>
                       {item.imageUrl && (
                         <div className="w-25 h-25 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-700">
                           <img
@@ -480,7 +548,7 @@ export default function RestaurantPage() {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (item.isAvailable) {
-                                  addToCart(item);
+                                  addToCart(item, category.name);
                                 }
                               }}
                               className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
@@ -596,7 +664,7 @@ export default function RestaurantPage() {
                   } font-semibold`}
                   onClick={() => {
                     if (selectedItem.isAvailable) {
-                      addToCartWithQuantity(selectedItem, itemQuantity);
+                      addToCartWithQuantity(selectedItem, itemQuantity, selectedCategory);
                       closeItemModal();
                     }
                   }}
@@ -700,16 +768,16 @@ export default function RestaurantPage() {
                       className="flex justify-between text-sm bg-neutral-700 p-3 rounded"
                     >
                       <span className="text-neutral-300 flex-1 min-w-0 truncate">
-                        {item.quantity}x {item.name}
+                        {item.quantity}x {item.categoryName}: {item.name}
                       </span>
-                      <span className="text-white font-medium ml-2">
+                      <span className="text-white font-medium rtl:mr-2 ltr:ml-2 price">
                         MAD{(parseFloat(item.price) * item.quantity).toFixed(2)}
                       </span>
                     </div>
                   ))}
-                  <div className="flex justify-between font-bold text-lg border-t border-neutral-700 pt-3">
+                  <div className="cart-total flex justify-between font-bold text-lg border-t border-neutral-700 pt-3">
                     <span className="text-white">{t("cart.total")}</span>
-                    <span className="text-white">
+                    <span className="text-white price">
                       MAD{getTotalPrice().toFixed(2)}
                     </span>
                   </div>

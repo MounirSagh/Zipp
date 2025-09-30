@@ -501,9 +501,16 @@ function Admin() {
                                       key={idx}
                                       className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0"
                                     >
-                                      <span className="text-black">
-                                        {item.name}
-                                      </span>
+                                      <div className="flex flex-col">
+                                        <span className="text-black font-medium">
+                                          {item.name}
+                                        </span>
+                                        {item.category && (
+                                          <span className="text-gray-500 text-sm">
+                                            Category: {item.category}
+                                          </span>
+                                        )}
+                                      </div>
                                       <div className="flex items-center space-x-4 text-gray-500">
                                         <span>{item.price} MAD</span>
                                         <span>×</span>
