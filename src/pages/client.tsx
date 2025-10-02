@@ -328,7 +328,7 @@ export default function RestaurantPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white relative overflow-hidden">
+    <div className="min-h-screen bg-neutral-900 text-white relative">
       {/* Decorative Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
         {/* Corner accent elements */}
