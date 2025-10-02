@@ -67,9 +67,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               state === "collapsed" && "opacity-0"
             )}
           >
-            <span className="text-lg font-serif font-bold tracking-wide text-primary uppercase">
-              ZIPP .
-            </span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                <h1 className="text-3xl font-bold text-black font-qwigley">
+                  ZIPP
+                </h1>
+                <h1 className="text-2xl font-bold text-yellow-500 font-qwigley mt-4">
+                  Dine
+                </h1>
+              </div>
+            </div>
           </div>
         </div>
       </SidebarHeader>

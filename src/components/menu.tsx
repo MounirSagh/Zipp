@@ -434,7 +434,7 @@ function Menu() {
         await fetchMenu();
         setShowCategoryModal(false);
         setCategoryForm({ name: "", description: "" });
-        setSuccess("Category created and synced to vector database");
+        setSuccess("Category created");
       } else {
         setError(data.error || "Failed to create category");
       }
@@ -467,7 +467,7 @@ function Menu() {
         setShowCategoryModal(false);
         setEditingCategory(null);
         setCategoryForm({ name: "", description: "" });
-        setSuccess("Category updated and synced to vector database");
+        setSuccess("Category updated");
       } else {
         setError(data.error || "Failed to update category");
       }
@@ -483,7 +483,7 @@ function Menu() {
   const deleteCategory = async (categoryId: number) => {
     if (
       !window.confirm(
-        "Are you sure? This will delete all items in this category and remove them from the vector database."
+        "Are you sure? This will delete all items in this category"
       )
     ) {
       return;
@@ -501,7 +501,7 @@ function Menu() {
       const data = await response.json();
       if (data.success) {
         await fetchMenu();
-        setSuccess("Category deleted and removed from vector database");
+        setSuccess("Category deleted");
       } else {
         setError(data.error || "Failed to delete category");
       }
@@ -540,7 +540,7 @@ function Menu() {
           ingredients: "",
           categoryId: "",
         });
-        setSuccess("Menu item created and synced to vector database");
+        setSuccess("Menu item created");
       } else {
         setError(data.error || "Failed to create item");
       }
@@ -580,7 +580,7 @@ function Menu() {
           ingredients: "",
           categoryId: "",
         });
-        setSuccess("Menu item updated and synced to vector database");
+        setSuccess("Menu item updated");
       } else {
         setError(data.error || "Failed to update item");
       }
@@ -610,7 +610,7 @@ function Menu() {
       const data = await response.json();
       if (data.success) {
         await fetchMenu();
-        setSuccess("Menu item deleted and removed from vector database");
+        setSuccess("Menu item deleted");
       } else {
         setError(data.error || "Failed to delete item");
       }
@@ -640,7 +640,7 @@ function Menu() {
         setSuccess(
           `Item ${
             !item.isAvailable ? "enabled" : "disabled"
-          } and vector database updated`
+          }`
         );
       } else {
         setError(data.error || "Failed to update availability");
