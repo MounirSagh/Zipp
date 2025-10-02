@@ -338,7 +338,7 @@ export default function RestaurantPage() {
         <div className="absolute bottom-0 right-0 w-40 h-40 border-r-2  border-yellow-300/40"></div>
       </div>
 
-      <div className="backdrop-blur-lg border-b border-neutral-800 sticky top-0 z-40 shadow-xl">
+      <div className="bg-neutral-900/95 backdrop-blur-lg border-b border-neutral-800 sticky top-0 z-50 shadow-xl">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
@@ -473,7 +473,7 @@ export default function RestaurantPage() {
             className="w-full"
           >
             {/* Menu Categories Section */}
-            <div className="sticky top-[73px] z-30 bg-gradient-to-b from-neutral-900 via-neutral-900/98 to-neutral-900/95 backdrop-blur-xl border-b border-yellow-300/20 pb-6 mb-8 -mx-4 px-4 shadow-lg">
+            <div className="sticky top-[73px] z-40 bg-gradient-to-b from-neutral-900 via-neutral-900/98 to-neutral-900/95 backdrop-blur-xl border-b border-yellow-300/20 pb-6 mb-8 -mx-4 px-4 shadow-lg">
               {/* Title Section */}
               <div className="text-center mb-6 pt-2">
                 <div className="flex items-center justify-center gap-3 mb-2">
