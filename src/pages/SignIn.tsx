@@ -49,7 +49,7 @@ export default function Home() {
               </Button>
             </DialogTrigger>
             <DialogContent className="border-none bg-transparent p-6 rounded-2xl shadow-xl flex justify-center items-center">
-              <SignIn afterSignInUrl="/dashboard" />
+              <SignIn afterSignInUrl="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/dashboard" />
             </DialogContent>
           </Dialog>
         </motion.div>

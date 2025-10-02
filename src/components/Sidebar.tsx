@@ -22,10 +22,10 @@ import { ChefHat, ClipboardList, LayoutDashboard } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 
 const mainNavItems = [
-  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/orders", label: "Orders", icon: ClipboardList },
-  { path: "/menu", label: "Menu", icon: ClipboardList },
-  { path: "/cuisine", label: "Cuisine", icon: ChefHat },
+  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/orders", label: "Orders", icon: ClipboardList },
+  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/menu", label: "Menu", icon: ClipboardList },
+  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/cuisine", label: "Cuisine", icon: ChefHat },
 ];
 
 function SidebarNavItem({

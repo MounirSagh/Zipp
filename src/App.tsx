@@ -12,11 +12,11 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<SignIn />} />
-        <Route path="/orders" element={<Admin />} />
-        <Route path="/cuisine" element={<CuisinePanel />} />
-        <Route path="/inventory" element={<Menu />} />
-        <Route path="/menu" element={<Menu />} />
-        <Route path="/dashboard" element={<Analytics />} />
+        <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/orders" element={<Admin />} />
+        <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/cuisine" element={<CuisinePanel />} />
+        <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/inventory" element={<Menu />} />
+        <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/menu" element={<Menu />} />
+        <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/dashboard" element={<Analytics />} />
         <Route path="/:code/:table" element={<RestaurantPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
