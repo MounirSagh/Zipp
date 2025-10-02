@@ -9,7 +9,8 @@
     "empty": "Your cart is empty",
     "total": "Total:",
     "checkout": "Proceed to Checkout",
-    "each": "each"
+    "each": "each",
+    "instructions": "Instructions"
   },
   "orderSuccess": {
     "title": "Order Submitted!",
@@ -24,7 +25,9 @@
     "ingredients": "Ingredients:",
     "details": "Item Details",
     "close": "Close",
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "specialInstructions": "Special Instructions",
+    "specialInstructionsPlaceholder": "Any special requests for this item..."
   },
   "checkout": {
     "title": "Checkout",

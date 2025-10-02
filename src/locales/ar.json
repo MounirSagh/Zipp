@@ -9,7 +9,8 @@
     "empty": "سلة التسوق فارغة",
     "total": "الإجمالي:",
     "checkout": "المتابعة للدفع",
-    "each": "لكل واحد"
+    "each": "لكل واحد",
+    "instructions": "التعليمات"
   },
   "orderSuccess": {
     "title": "تم إرسال الطلب!",
@@ -24,7 +25,9 @@
     "ingredients": "المكونات:",
     "details": "تفاصيل العنصر",
     "close": "إغلاق",
-    "quantity": "الكمية"
+    "quantity": "الكمية",
+    "specialInstructions": "تعليمات خاصة",
+    "specialInstructionsPlaceholder": "أي طلبات خاصة لهذا العنصر..."
   },
   "checkout": {
     "title": "الدفع",

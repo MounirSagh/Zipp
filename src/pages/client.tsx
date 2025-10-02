@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ShoppingCartIcon, Trash } from "lucide-react";
+import { ChevronDown, ShoppingCartIcon, Trash } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import Preloader from "@/components/Preloader";
 import { AnimatePresence } from "framer-motion";
@@ -43,6 +43,7 @@ type MenuCategory = {
 type CartItem = MenuItem & {
   quantity: number;
   categoryName: string;
+  specialInstructions?: string;
 };
 
 type CustomerInfo = {
@@ -70,6 +71,7 @@ export default function RestaurantPage() {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [itemQuantity, setItemQuantity] = useState(1);
+  const [itemSpecialInstructions, setItemSpecialInstructions] = useState("");
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     specialInstructions: "",
     table: tableNumber,
@@ -130,18 +132,22 @@ export default function RestaurantPage() {
   const addToCartWithQuantity = (
     item: MenuItem,
     quantity: number,
-    categoryName: string
+    categoryName: string,
+    specialInstructions?: string
   ) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+      const existingItem = prevCart.find((cartItem) => 
+        cartItem.id === item.id && 
+        cartItem.specialInstructions === specialInstructions
+      );
       if (existingItem) {
         return prevCart.map((cartItem) =>
-          cartItem.id === item.id
+          cartItem.id === item.id && cartItem.specialInstructions === specialInstructions
             ? { ...cartItem, quantity: cartItem.quantity + quantity }
             : cartItem
         );
       } else {
-        return [...prevCart, { ...item, quantity, categoryName }];
+        return [...prevCart, { ...item, quantity, categoryName, specialInstructions }];
       }
     });
   };
@@ -150,12 +156,14 @@ export default function RestaurantPage() {
     setSelectedItem(item);
     setSelectedCategory(categoryName);
     setItemQuantity(1);
+    setItemSpecialInstructions("");
   };
 
   const closeItemModal = () => {
     setSelectedItem(null);
     setSelectedCategory("");
     setItemQuantity(1);
+    setItemSpecialInstructions("");
   };
 
   const removeFromCart = (itemId: number) => {
@@ -200,7 +208,14 @@ export default function RestaurantPage() {
         price: parseFloat(item.price),
         quantity: item.quantity,
         category: item.categoryName,
+        specialInstructions: item.specialInstructions,
       }));
+
+      // Collect all item-level special instructions
+      const allInstructions = cart
+        .filter(item => item.specialInstructions?.trim())
+        .map(item => `${item.name}: ${item.specialInstructions}`)
+        .join('; ');
 
       const orderData = {
         restaurantId,
@@ -209,7 +224,7 @@ export default function RestaurantPage() {
         lastName: "-",
         orderItems,
         totalAmount: getTotalPrice(),
-        specialInstructions: customerInfo.specialInstructions || "-",
+        specialInstructions: allInstructions || "-",
         location: customerInfo.location,
         table: tableNumber,
       };
@@ -399,6 +414,11 @@ export default function RestaurantPage() {
                               MAD{parseFloat(item.price).toFixed(2)}{" "}
                               {t("cart.each")}
                             </p>
+                            {item.specialInstructions && (
+                              <p className="text-xs text-yellow-300 mt-1 italic truncate">
+                                {t("cart.instructions")}: {item.specialInstructions}
+                              </p>
+                            )}
                           </div>
                           <div className="quantity-controls flex items-center gap-1 rtl:mr-2 ltr:ml-2">
                             <Button
@@ -582,12 +602,8 @@ export default function RestaurantPage() {
                                 </span>
                               )}
                               <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (item.isAvailable) {
-                                    addToCart(item, category.name);
-                                  }
-                                }}
+                                key={item.id}
+                                onClick={() => openItemModal(item, category.name)}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
                                   item.isAvailable
                                     ? "bg-neutral-600 hover:bg-neutral-500 cursor-pointer active:scale-95"
@@ -595,7 +611,7 @@ export default function RestaurantPage() {
                                 }`}
                               >
                                 <span className="text-white text-lg font-bold">
-                                  +
+                                  <ChevronDown />
                                 </span>
                               </div>
                             </div>
@@ -684,6 +700,19 @@ export default function RestaurantPage() {
                       </Button>
                     </div>
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-white">
+                      {t("menu.specialInstructions")} ({t("checkout.optionality")})
+                    </label>
+                    <textarea
+                      className="w-full p-3 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:border-neutral-500 focus:outline-none resize-none text-sm min-h-[60px]"
+                      rows={2}
+                      value={itemSpecialInstructions}
+                      onChange={(e) => setItemSpecialInstructions(e.target.value)}
+                      placeholder={t("menu.specialInstructionsPlaceholder")}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -706,7 +735,8 @@ export default function RestaurantPage() {
                       addToCartWithQuantity(
                         selectedItem,
                         itemQuantity,
-                        selectedCategory
+                        selectedCategory,
+                        itemSpecialInstructions.trim() || undefined
                       );
                       closeItemModal();
                     }
@@ -784,38 +814,28 @@ export default function RestaurantPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-white">
-                  {t("checkout.specialInstructions")} (
-                  {t("checkout.optionality")})
-                </label>
-                <textarea
-                  className="w-full p-3 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:border-neutral-500 focus:outline-none resize-none text-base min-h-[80px]"
-                  rows={3}
-                  value={customerInfo.specialInstructions}
-                  onChange={(e) =>
-                    setCustomerInfo((prev) => ({
-                      ...prev,
-                      specialInstructions: e.target.value,
-                    }))
-                  }
-                  placeholder={t("checkout.specialInstructionsPlaceholder")}
-                />
-              </div>
+
 
               <div className="border-t border-neutral-700 pt-4">
                 <div className="space-y-2">
-                  {cart.map((item) => (
+                  {cart.map((item, index) => (
                     <div
-                      key={item.id}
-                      className="flex justify-between text-sm bg-neutral-700 p-3 rounded"
+                      key={`${item.id}-${index}`}
+                      className="bg-neutral-700 p-3 rounded"
                     >
-                      <span className="text-neutral-300 flex-1 min-w-0 truncate">
-                        {item.quantity}x {item.categoryName}: {item.name}
-                      </span>
-                      <span className="text-white font-medium rtl:mr-2 ltr:ml-2 price">
-                        MAD{(parseFloat(item.price) * item.quantity).toFixed(2)}
-                      </span>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-neutral-300 flex-1 min-w-0 truncate">
+                          {item.quantity}x {item.categoryName}: {item.name}
+                        </span>
+                        <span className="text-white font-medium rtl:mr-2 ltr:ml-2 price">
+                          MAD{(parseFloat(item.price) * item.quantity).toFixed(2)}
+                        </span>
+                      </div>
+                      {item.specialInstructions && (
+                        <div className="mt-2 text-xs text-yellow-300 italic">
+                          <span className="font-semibold">{t("cart.instructions")}:</span> {item.specialInstructions}
+                        </div>
+                      )}
                     </div>
                   ))}
                   <div className="cart-total flex justify-between font-bold text-lg border-t border-neutral-700 pt-3">

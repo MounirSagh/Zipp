@@ -9,7 +9,8 @@
     "empty": "Votre panier est vide",
     "total": "Total :",
     "checkout": "Procéder au Paiement",
-    "each": "chacun"
+    "each": "chacun",
+    "instructions": "Instructions"
   },
   "orderSuccess": {
     "title": "Commande Soumise !",
@@ -24,7 +25,9 @@
     "ingredients": "Ingrédients :",
     "details": "Détails de l'Article",
     "close": "Fermer",
-    "quantity": "Quantité"
+    "quantity": "Quantité",
+    "specialInstructions": "Instructions Spéciales",
+    "specialInstructionsPlaceholder": "Des demandes spéciales pour cet article..."
   },
   "checkout": {
     "title": "Paiement",
