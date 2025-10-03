@@ -18,13 +18,13 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { ChefHat, ClipboardList, LayoutDashboard } from "lucide-react";
+import { ChefHat, ClipboardList, LayoutDashboard, Menu } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
 
 const mainNavItems = [
   { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/orders", label: "Orders", icon: ClipboardList },
-  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/menu", label: "Menu", icon: ClipboardList },
+  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/menu", label: "Menu", icon: Menu },
   { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/cuisine", label: "Cuisine", icon: ChefHat },
 ];
 
@@ -59,7 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="border-b border-sidebar-border">
+      <SidebarHeader className="border-b border-sidebar-border bg-white">
         <div className="flex items-center justify-center gap-2 py-2">
           <div
             className={cn(
@@ -81,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="bg-white">
         <SidebarGroup>
           <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -93,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="bg-white">
         <Button onClick={() => signOut()}>Logout</Button>
       </SidebarFooter>
 

@@ -201,7 +201,7 @@ function SortableCategory({
                       {item.name}
                     </h3>
                     <span className="text-lg font-semibold text-green-600 whitespace-nowrap">
-                      ${Number.parseFloat(item.price).toFixed(2)}
+                      MAD{Number.parseFloat(item.price).toFixed(2)}
                     </span>
                   </div>
                   {item.description && (
@@ -867,7 +867,7 @@ function Menu() {
                       </div>
                       {result.metadata.price && (
                         <span className="text-lg font-semibold text-green-600">
-                          ${result.metadata.price.toFixed(2)}
+                          MAD{result.metadata.price.toFixed(2)}
                         </span>
                       )}
                     </div>
