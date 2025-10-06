@@ -19,13 +19,34 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { ChefHat, ClipboardList, LayoutDashboard, Menu } from "lucide-react";
-import { useClerk } from "@clerk/clerk-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
 
 const mainNavItems = [
-  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/orders", label: "Orders", icon: ClipboardList },
-  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/menu", label: "Menu", icon: Menu },
-  { path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/cuisine", label: "Cuisine", icon: ChefHat },
+  {
+    path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/orders",
+    label: "Orders",
+    icon: ClipboardList,
+  },
+  {
+    path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/menu",
+    label: "Menu",
+    icon: Menu,
+  },
+  {
+    path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/cuisine",
+    label: "Cuisine",
+    icon: ChefHat,
+  },
+  {
+    path: "/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/feedbacks",
+    label: "Feedbacks",
+    icon: ClipboardList,
+  },
 ];
 
 function SidebarNavItem({
@@ -56,6 +77,15 @@ function SidebarNavItem({
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar();
   const { signOut } = useClerk();
+  const { user } = useUser();
+
+  // Filter navigation items based on user plan
+  const filteredNavItems = mainNavItems.filter((item) => {
+    if (item.path.includes("/feedbacks")) {
+      return user?.publicMetadata?.plan === "pro";
+    }
+    return true;
+  });
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -86,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {mainNavItems.map((item) => (
+              {filteredNavItems.map((item) => (
                 <SidebarNavItem key={item.path} {...item} />
               ))}
             </SidebarMenu>

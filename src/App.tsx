@@ -6,6 +6,7 @@ import Menu from "./pages/menu";
 import NotFound from "./pages/notfound";
 import Analytics from "./pages/analytics";
 import RestaurantPage from "./pages/client";
+import Feedbacks from "./pages/feedbacks";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/inventory" element={<Menu />} />
         <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/menu" element={<Menu />} />
         <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/dashboard" element={<Analytics />} />
+        <Route path="/WjN2Y1hMTk5saEFneUZZeWZScW1uUjVkRkJoU0E9PQ/feedbacks" element={<Feedbacks />} />
         <Route path="/:code/:table" element={<RestaurantPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
