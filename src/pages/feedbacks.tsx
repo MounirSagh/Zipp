@@ -15,7 +15,6 @@ import {
   ChevronDown,
   ChevronUp,
   MessageSquare,
-  Star,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
