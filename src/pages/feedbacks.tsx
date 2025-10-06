@@ -17,8 +17,10 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
+  Download,
 } from "lucide-react";
 import { Layout } from "@/components/Layout";
+import jsPDF from "jspdf";
 
 function Feedbacks() {
   const [feedbacks, setFeedbacks] = useState<any>([]);
@@ -27,6 +29,7 @@ function Feedbacks() {
   );
   const { user, isSignedIn } = useUser();
   const [loading, setLoading] = useState(true);
+  const [analysisloading, setAnalysisLoading] = useState(false);
   const [page, setPage] = useState<number>(0);
   const [totalFeedbacks, setTotalFeedbacks] = useState<number>(0);
   const itemsPerPage = 10;
@@ -58,6 +61,90 @@ function Feedbacks() {
     }
   };
 
+  const fetchAnalysis = async () => {
+    try {
+      setAnalysisLoading(true);
+      const response = await fetch(
+        `https://zipp-backend.vercel.app/api/feedbacks/analysis/${user?.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const analysisText = await response.text();
+      console.log("Analysis received:", analysisText);
+
+      // Create PDF from the formatted text
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const maxWidth = pageWidth - 2 * margin;
+
+      // Split text into lines and handle page breaks
+      const lines = pdf.splitTextToSize(analysisText, maxWidth);
+      const lineHeight = 7;
+      let yPosition = margin;
+
+      // Add title
+      pdf.setFontSize(16);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Customer Feedback Analysis Report", margin, yPosition);
+      yPosition += lineHeight * 2;
+
+      // Reset font for content
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+
+      // Add content with page breaks
+      for (let i = 0; i < lines.length; i++) {
+        if (yPosition > pageHeight - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+
+        const line = lines[i];
+
+        // Handle different text styles based on content
+        if (line.startsWith("#")) {
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(14);
+        } else if (line.startsWith("##")) {
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(12);
+        } else if (line.startsWith("-") || line.startsWith("•")) {
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(10);
+        } else {
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(10);
+        }
+
+        pdf.text(line, margin, yPosition);
+        yPosition += lineHeight;
+      }
+
+      // Generate filename with current date
+      const currentDate = new Date().toISOString().split("T")[0];
+      const filename = `feedback-analysis-${currentDate}.pdf`;
+
+      // Download the PDF
+      pdf.save(filename);
+    } catch (err: any) {
+      console.error("Error generating PDF:", err);
+      alert("Failed to generate PDF. Please try again.");
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
+
   const fetchFeedbacks = async (pageNumber: number = page) => {
     try {
       setLoading(true);
@@ -71,10 +158,9 @@ function Feedbacks() {
         }
       );
       const data = await response.json();
-      console.log(data);
-      setFeedbacks(data.feedbacks || data); // Handle both paginated and non-paginated responses
+      setFeedbacks(data.feedbacks || data);
       setTotalFeedbacks(data.total || data.length || 0);
-      setExpandedFeedbackId(null); // Close any expanded rows
+      setExpandedFeedbackId(null);
     } catch (err: any) {
       console.log(err);
     } finally {
@@ -140,6 +226,16 @@ function Feedbacks() {
       </div>
     );
   }
+  if (analysisloading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-500 text-sm">Report is Generating. This may take a minute or two!</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Layout>
@@ -165,6 +261,20 @@ function Feedbacks() {
                 >
                   <span>Refresh</span>
                 </Button>
+                {totalFeedbacks % 100 == 0 && (
+                    <Button
+                      onClick={fetchAnalysis}
+                      disabled={loading}
+                      className="flex items-center bg-blue-600 hover:bg-blue-700 text-white disabled:bg-blue-400"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>
+                        {loading
+                          ? "Generating PDF..."
+                          : "Report"}
+                      </span>
+                    </Button>
+                  )}
                 <div className="text-right">
                   <div className="text-sm text-gray-500">
                     {totalFeedbacks} feedback
